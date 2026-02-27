@@ -6,6 +6,7 @@ class AuthServices extends GetxService {
   late final Client client;
   late final Account account;
   late final Databases databases;
+  late final Functions function;
 
   @override
   void onInit() {
@@ -16,6 +17,7 @@ class AuthServices extends GetxService {
 
     account = Account(client);
     databases = Databases(client);
+    function = Functions(client);
   }
 
   Future<void> login(String email, String password) async {

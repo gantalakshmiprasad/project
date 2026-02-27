@@ -1,4 +1,7 @@
+// ignore_for_file: avoid_print
+
 import 'package:firstproject/authservices.dart';
+import 'package:firstproject/important.dart';
 import 'package:get/get.dart';
 
 class Homepagecontroller extends GetxController {
@@ -7,7 +10,11 @@ class Homepagecontroller extends GetxController {
   final password = '12345678';
   Future<void> clicked() async {
     try {
-      Get.find<AuthServices>().login(email, password);
+      final message = await Get.find<AuthServices>().function.createExecution(
+        functionId: functionid,
+        body: 'This is a function',
+      );
+      print(message.responseBody);
     } catch (e) {
       throw Exception(e.toString());
     }

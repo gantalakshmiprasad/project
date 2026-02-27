@@ -10,11 +10,19 @@ class Homepage extends StatelessWidget {
     final controller = Get.put(Homepagecontroller());
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            controller.clicked();
-          },
-          child: Text('press'),
+        child: Column(
+          children: [
+            Text(
+              controller.message.string,
+              style: TextStyle(fontSize: 30, color: Colors.blue),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                controller.clicked();
+              },
+              child: Text('press'),
+            ),
+          ],
         ),
       ),
     );
