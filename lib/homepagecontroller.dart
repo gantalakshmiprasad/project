@@ -1,7 +1,3 @@
-// ignore_for_file: avoid_print
-
-import 'dart:convert';
-
 import 'package:appwrite/enums.dart';
 import 'package:firstproject/authservices.dart';
 import 'package:firstproject/important.dart';
@@ -13,12 +9,12 @@ class Homepagecontroller extends GetxController {
   final password = '12345678';
   Future<void> clicked() async {
     try {
-      final message = await Get.find<AuthServices>().function.createExecution(
+      final result = await Get.find<AuthServices>().function.createExecution(
         functionId: functionid,
         method: ExecutionMethod.pOST,
         headers: {'message': 'Hello this is lakshmiprasad'},
       );
-      print(message.responseBody);
+      message.value = result.responseBody;
     } catch (e) {
       throw Exception(e.toString());
     }
