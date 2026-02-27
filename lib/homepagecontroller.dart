@@ -1,5 +1,8 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
+import 'package:appwrite/enums.dart';
 import 'package:firstproject/authservices.dart';
 import 'package:firstproject/important.dart';
 import 'package:get/get.dart';
@@ -12,7 +15,8 @@ class Homepagecontroller extends GetxController {
     try {
       final message = await Get.find<AuthServices>().function.createExecution(
         functionId: functionid,
-        body: 'This is a function',
+        method: ExecutionMethod.pOST,
+        headers: {'message': 'Hello this is lakshmiprasad'},
       );
       print(message.responseBody);
     } catch (e) {
