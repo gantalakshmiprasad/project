@@ -12,6 +12,7 @@ class Homepage extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
+            SizedBox(height: 150),
             Text(
               controller.message.string,
               style: TextStyle(fontSize: 30, color: Colors.blue),
