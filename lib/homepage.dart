@@ -14,16 +14,25 @@ class Homepage extends StatelessWidget {
           children: [
             SizedBox(height: 150),
             Obx(() {
-              return Text(controller.message.value);
+              return controller.hasimage.value
+                  ? Image.network(controller.imageurl.value)
+                  : Text('No image yet');
             }),
-            TextFormField(
-              decoration: InputDecoration(hintText: 'enter the prompt'),
+            SizedBox(
+              width: 400,
+              child: TextFormField(
+                decoration: InputDecoration(hintText: 'enter the prompt'),
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                controller.clicked(controller.prompt.text);
-              },
-              child: Text('press'),
+            SizedBox(height: 48),
+            SizedBox(
+              width: 400,
+              child: ElevatedButton(
+                onPressed: () {
+                  controller.clicked(controller.prompt.text);
+                },
+                child: Text('press'),
+              ),
             ),
           ],
         ),
