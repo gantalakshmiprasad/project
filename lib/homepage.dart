@@ -13,13 +13,15 @@ class Homepage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 150),
-            Text(
-              controller.message.string,
-              style: TextStyle(fontSize: 30, color: Colors.blue),
+            Obx(() {
+              return Text(controller.message.value);
+            }),
+            TextFormField(
+              decoration: InputDecoration(hintText: 'enter the prompt'),
             ),
             ElevatedButton(
               onPressed: () {
-                controller.clicked();
+                controller.clicked(controller.prompt.text);
               },
               child: Text('press'),
             ),
