@@ -1,5 +1,7 @@
-import 'package:firstproject/authservices.dart';
+import 'package:firstproject/model/authservices.dart';
+import 'package:firstproject/view/homepage.dart';
 import 'package:firstproject/view/signin.dart';
+import 'package:firstproject/view/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,7 +10,7 @@ void main() async {
   try {
     await Get.putAsync<AuthServices>(() async => AuthServices());
   } catch (e) {
-    print('Failed to initialize AuthServices: $e');
+    throw Exception('Failed to initialize AuthServices: $e');
     // Continue anyway - AuthServices might fail on web but app should still work
   }
   runApp(const MyApp());
@@ -25,6 +27,11 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       home: LoginScreen(),
+      initialRoute: '/',
+      getPages: [
+        GetPage(name: '/signup', page: () => Signup()),
+        GetPage(name: '/homepage', page: () => Homepage()),
+      ],
     );
   }
 }

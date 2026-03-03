@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 import 'package:appwrite/enums.dart';
-import 'package:firstproject/authservices.dart';
-import 'package:firstproject/important.dart';
+import 'package:firstproject/model/authservices.dart';
+import 'package:firstproject/customs/important.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

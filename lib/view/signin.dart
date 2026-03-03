@@ -122,6 +122,10 @@ class LoginScreen extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {
                               controller.globalkey.currentState!.validate();
+                              controller.signin(
+                                controller.emailcontroller.text.trim(),
+                                controller.passwordcontroller.text.trim(),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Appcolors().buttoncolor,
