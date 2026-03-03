@@ -1,5 +1,5 @@
 import 'package:firstproject/authservices.dart';
-import 'package:firstproject/homepage.dart';
+import 'package:firstproject/view/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,10 +20,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: Homepage(),
+      home: LoginScreen(),
     );
   }
 }
