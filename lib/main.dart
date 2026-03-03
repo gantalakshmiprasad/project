@@ -5,7 +5,12 @@ import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Get.putAsync<AuthServices>(() async => AuthServices());
+  try {
+    await Get.putAsync<AuthServices>(() async => AuthServices());
+  } catch (e) {
+    print('Failed to initialize AuthServices: $e');
+    // Continue anyway - AuthServices might fail on web but app should still work
+  }
   runApp(const MyApp());
 }
 

@@ -14,13 +14,39 @@ class Homepage extends StatelessWidget {
           children: [
             SizedBox(height: 150),
             Obx(() {
-              return controller.hasimage.value
-                  ? Image.network(controller.imageurl.value)
-                  : Text('No image yet');
+              if (controller.isDownloading.value) {
+                return const CircularProgressIndicator();
+              }
+              if (controller.errorMessage.value.isNotEmpty) {
+                return Text(
+                  controller.errorMessage.value,
+                  style: const TextStyle(color: Colors.red),
+                );
+              }
+              if (controller.imageurl.value.isNotEmpty) {
+                return Container(
+                  height: 250,
+                  width: 250,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.orange),
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                    child: Image.network(
+                      controller.imageurl.string,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              }
+              return const Text('No image yet');
             }),
+
             SizedBox(
               width: 400,
               child: TextFormField(
+                controller: controller.prompt,
                 decoration: InputDecoration(hintText: 'enter the prompt'),
               ),
             ),
@@ -29,7 +55,7 @@ class Homepage extends StatelessWidget {
               width: 400,
               child: ElevatedButton(
                 onPressed: () {
-                  controller.clicked(controller.prompt.text);
+                  controller.clicked(controller.prompt.text.trim().toString());
                 },
                 child: Text('press'),
               ),

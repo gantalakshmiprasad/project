@@ -11,20 +11,24 @@ class AuthServices extends GetxService {
   @override
   void onInit() {
     super.onInit();
-    client = Client()
-        .setEndpoint(apiendpoint) // e.g. 'http://localhost/v1'
-        .setProject(projectid); // your project ID
+    try {
+      client = Client()
+          .setEndpoint(apiendpoint) // e.g. 'http://localhost/v1'
+          .setProject(projectid); // your project ID
 
-    account = Account(client);
-    databases = Databases(client);
-    function = Functions(client);
+      account = Account(client);
+      databases = Databases(client);
+      function = Functions(client);
+    } catch (e) {
+      print('AuthServices initialization error: $e');
+    }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<void> login() async {
     try {
       final session = await account.createEmailPasswordSession(
-        email: email,
-        password: password,
+        email: 'chuchu.aadhavan@gmail.com',
+        password: '12345678',
       );
       print('Login successful: $session');
     } catch (e) {
