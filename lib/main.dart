@@ -2,6 +2,7 @@ import 'package:firstproject/model/authservices.dart';
 import 'package:firstproject/view/homepage.dart';
 import 'package:firstproject/view/signin.dart';
 import 'package:firstproject/view/signup.dart';
+import 'package:firstproject/view/verificationpage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,11 +27,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: LoginScreen(),
+
       initialRoute: '/',
       getPages: [
+        GetPage(name: '/', page: () => LoginScreen()),
         GetPage(name: '/signup', page: () => Signup()),
         GetPage(name: '/homepage', page: () => Homepage()),
+        GetPage(name: '/verificationpage', page: () => Verificationpage()),
       ],
     );
   }

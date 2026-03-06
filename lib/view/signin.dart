@@ -151,7 +151,9 @@ class LoginScreen extends StatelessWidget {
                               style: TextStyle(color: Colors.white),
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.offAllNamed('/signup');
+                              },
                               child: Text(
                                 'signup',
                                 style: TextStyle(color: Colors.white),

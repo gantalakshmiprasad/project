@@ -2,7 +2,6 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:appwrite/models.dart' as models;
 import 'package:firstproject/customs/config.dart';
-import 'package:firstproject/customs/important.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/state_manager.dart';
 
@@ -32,27 +31,28 @@ class AuthServices extends GetxService {
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     try {
       await account.createEmailPasswordSession(
         email: email,
         password: password,
       );
-      Get.snackbar('Success', 'Login successfully');
+
+      return true;
     } catch (e) {
       Get.snackbar('Failure', e.toString());
       throw Exception(e.toString());
     }
   }
 
-  Future<void> signup(String email, String password) async {
+  Future<void> signup(String name, String email, String password) async {
     try {
       await account.create(
         userId: ID.unique(),
+        name: name,
         email: email,
         password: password,
       );
-      await account.createEmailVerification(url: '');
     } catch (e) {
       throw Exception(e.toString());
     }
