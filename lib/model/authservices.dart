@@ -1,9 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:appwrite/models.dart' as models;
 import 'package:firstproject/customs/config.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/state_manager.dart';
+import 'package:http/http.dart' as http;
 
 class AuthServices extends GetxService {
   late final Client client;
@@ -27,7 +31,12 @@ class AuthServices extends GetxService {
       storage = Storage(client);
       table = TablesDB(client);
     } catch (e) {
-      Exception('AuthServices initialization error: $e');
+      throw Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -40,8 +49,14 @@ class AuthServices extends GetxService {
 
       return true;
     } catch (e) {
-      Get.snackbar('Failure', e.toString());
-      throw Exception(e.toString());
+      throw Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        showProgressIndicator: true,
+        progressIndicatorBackgroundColor: Colors.red,
+      );
     }
   }
 
@@ -54,7 +69,12 @@ class AuthServices extends GetxService {
         password: password,
       );
     } catch (e) {
-      throw Exception(e.toString());
+      throw Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -63,7 +83,12 @@ class AuthServices extends GetxService {
       await account.createEmailVerification(url: url);
       return true;
     } catch (e) {
-      throw Exception(e.toString());
+      throw Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -72,41 +97,51 @@ class AuthServices extends GetxService {
       await account.updateEmailVerification(userId: userId, secret: secret);
       return true;
     } catch (e) {
-      throw Exception(e.toString());
+      throw Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
-  Future<bool> getaccount() async {
+  Future<String> getaccount() async {
     try {
-      await account.get();
-      return true;
+      final user = await account.get();
+      return user.$id;
     } catch (e) {
       throw Exception(e.toString());
     }
   }
 
-  Future<bool> forgotpassword(
-    String userId,
-    String secret,
-    String password,
-  ) async {
+  Future<void> sendForgotPasswordEmail(String email) async {
     try {
-      await account.createEmailVerification(url: '');
-      final verified = await updateemailverification(userId, secret);
-      if (verified) {
-        await account.updatePassword(password: password);
-        return true;
-      } else {
-        return false;
-      }
+      // The URL should match your localhost:3030 setup from launch.json
+      await account.createRecovery(
+        email: email,
+        url: 'http://localhost:3030/#/Resetpassword',
+      );
+      Get.snackbar("Success", "Check your email for the reset link!");
     } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<dynamic> changepassword(String email, String password) async {
+    try {} catch (e) {
       throw Exception(e.toString());
     }
   }
 
   //form here Database methods starts
   /// 1. CREATE - Add a new document
-  Future<Map<String, dynamic>?> createEntry(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>?> createEntry(Map<String, String> data) async {
     try {
       final document = await table.createRow(
         databaseId: ApiConfig().databaseId,
@@ -116,7 +151,12 @@ class AuthServices extends GetxService {
       );
       return document.data;
     } on AppwriteException catch (e) {
-      Exception('Create Error: ${e.message}');
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       return null;
     }
   }
@@ -136,13 +176,18 @@ class AuthServices extends GetxService {
 
       return result.data;
     } on AppwriteException catch (e) {
-      Exception('Read Error: ${e.message}');
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       return null;
     }
   }
 
   /// 3. UPDATE - Modify an existing document
-  Future<Row?> updateEntry(
+  Future<dynamic> updateEntry(
     String rowId,
     Map<String, dynamic> updatedData,
   ) async {
@@ -155,7 +200,12 @@ class AuthServices extends GetxService {
       );
       return document;
     } on AppwriteException catch (e) {
-      Exception('Update Error: ${e.message}');
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       return null;
     }
   }
@@ -170,39 +220,52 @@ class AuthServices extends GetxService {
       );
       return true;
     } on AppwriteException catch (e) {
-      Exception('Delete Error: ${e.message}');
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       return false;
     }
   }
-}
 
-class StorageService {
-  final Storage _storage;
-  static const String bucketId = 'YOUR_BUCKET_ID';
-
-  StorageService(Client client) : _storage = Storage(client);
-
-  /// 1. CREATE - Upload a File
-  /// For Mobile/Desktop: use InputFile.fromPath
-  /// For Web: use InputFile.fromBytes
-  Future<models.File?> uploadFile(String filePath, String fileName) async {
+  Future<String?> uploadFileWeb(
+    Uint8List fileBytes,
+    String fileName,
+    String userid,
+  ) async {
     try {
-      final result = await _storage.createFile(
-        bucketId: bucketId,
+      final result = await storage.createFile(
+        bucketId: ApiConfig().bucketId,
+
         fileId: ID.unique(),
-        file: InputFile.fromPath(path: filePath, filename: fileName),
+        file: InputFile.fromBytes(bytes: fileBytes, filename: fileName),
       );
-      return result;
+      return result.$id; // File ID for reference
     } on AppwriteException catch (e) {
       Exception('Upload Error: ${e.message}');
       return null;
     }
   }
 
+  Future<Uint8List> urlToBytes(String imageUrl) async {
+    try {
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return response.bodyBytes; // raw bytes of the image
+      } else {
+        throw Exception('failed');
+      }
+    } catch (e) {
+      throw Exception('failed');
+    }
+  }
+
   /// 2. READ - Get File Metadata or List Files
   Future<models.FileList?> listAllFiles() async {
     try {
-      return await _storage.listFiles(bucketId: bucketId);
+      return await storage.listFiles(bucketId: ApiConfig().bucketId);
     } catch (e) {
       Exception('List Error: $e');
       return null;
@@ -214,8 +277,8 @@ class StorageService {
   /// you must delete and re-upload to "change" the image.
   Future<File?> updateFileMetadata(String fileId, String newName) async {
     try {
-      return await _storage.updateFile(
-        bucketId: bucketId,
+      return await storage.updateFile(
+        bucketId: ApiConfig().bucketId,
         fileId: fileId,
         name: newName,
       );
@@ -228,7 +291,7 @@ class StorageService {
   /// 4. DELETE - Remove a File
   Future<bool> deleteFile(String fileId) async {
     try {
-      await _storage.deleteFile(bucketId: bucketId, fileId: fileId);
+      await storage.deleteFile(bucketId: ApiConfig().bucketId, fileId: fileId);
       return true;
     } catch (e) {
       Exception('Delete Error: $e');
@@ -239,9 +302,9 @@ class StorageService {
   /// 5. EXTRA: Get Preview/Download URL
   /// This returns a URL you can use in Image.network()
   String getFilePreview(String fileId) {
-    return _storage
+    return storage
         .getFilePreview(
-          bucketId: bucketId,
+          bucketId: ApiConfig().bucketId,
           fileId: fileId,
           width: 300, // Optional transformation
           quality: 80,

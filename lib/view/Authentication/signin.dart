@@ -3,7 +3,7 @@
 import 'dart:ui';
 import 'package:firstproject/customs/customwidgets.dart';
 import 'package:firstproject/customs/uicustoms.dart';
-import 'package:firstproject/viewmodel/signincontroller.dart';
+import 'package:firstproject/viewmodel/Authenticationctl/signincontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -98,14 +98,7 @@ class LoginScreen extends StatelessWidget {
                           alignment: AlignmentGeometry.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              Get.defaultDialog(
-                                title: "Forgot password",
-                                backgroundColor: Colors.blue,
-                                content: Dialogbox(
-                                  email: controller.emailcontroller,
-                                  password: controller.passwordcontroller,
-                                ),
-                              );
+                              Get.offAllNamed('/forgotpassword');
                             },
 
                             child: Text(

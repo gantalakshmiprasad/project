@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:firstproject/model/authservices.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Verificationcontroller extends GetxController {
@@ -16,8 +17,9 @@ class Verificationcontroller extends GetxController {
   void _handleRedirectParams() async {
     // 1. Retrieve the parameters from GetX
     isloading.value = true;
-    String? userId = Get.parameters['userId'];
-    String? secret = Get.parameters['secret'];
+    final uri = Uri.base; // full current URL
+    final userId = uri.queryParameters['userId'];
+    final secret = uri.queryParameters['secret'];
     print(userId);
     print(secret);
     if (userId != null && secret != null) {
@@ -28,7 +30,14 @@ class Verificationcontroller extends GetxController {
         // Success! Navigate away
       } catch (e) {
         isverified.value = false;
-        Get.snackbar("Error", "Authentication failed: ${e.toString()}");
+        Get.snackbar(
+          'Error',
+          e.toString(),
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      } finally {
+        isloading.value = false;
       }
     }
   }

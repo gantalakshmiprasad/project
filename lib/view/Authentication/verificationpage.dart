@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:firstproject/customs/uicustoms.dart';
-import 'package:firstproject/viewmodel/verificationcontroller.dart';
+import 'package:firstproject/viewmodel/Authenticationctl/verificationcontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -48,16 +48,47 @@ class Verificationpage extends StatelessWidget {
                                   Radius.circular(25),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                              child: Column(
                                 children: [
-                                  Icon(Icons.verified),
-                                  Text(
-                                    "Verified",
-                                    style: TextStyle(
-                                      fontSize: 35,
-                                      color: Colors.green,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Icon(
+                                        Icons.verified,
+                                        color: Colors.green,
+                                        size: 55,
+                                      ),
+                                      Text(
+                                        "Verified",
+                                        style: TextStyle(
+                                          fontSize: 35,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 35),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 80,
+                                      ),
+                                      backgroundColor: Appcolors().buttoncolor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    onPressed: () {
+                                      Get.offAllNamed('/');
+                                    },
+                                    child: Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 25,
+                                      ),
                                     ),
                                   ),
                                 ],

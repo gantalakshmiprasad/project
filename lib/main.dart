@@ -1,8 +1,10 @@
 import 'package:firstproject/model/authservices.dart';
-import 'package:firstproject/view/homepage.dart';
-import 'package:firstproject/view/signin.dart';
-import 'package:firstproject/view/signup.dart';
-import 'package:firstproject/view/verificationpage.dart';
+import 'package:firstproject/view/Authentication/forgotpassword.dart';
+import 'package:firstproject/view/bussinesslogic/Homepage.dart';
+import 'package:firstproject/view/Authentication/resetpassword.dart';
+import 'package:firstproject/view/Authentication/signin.dart';
+import 'package:firstproject/view/Authentication/signup.dart';
+import 'package:firstproject/view/Authentication/verificationpage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -34,6 +36,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/signup', page: () => Signup()),
         GetPage(name: '/homepage', page: () => Homepage()),
         GetPage(name: '/verificationpage', page: () => Verificationpage()),
+        GetPage(name: '/forgotpassword', page: () => Forgotpassword()),
+        GetPage(name: '/Resetpassword', page: () => Resetpassword()),
       ],
     );
   }

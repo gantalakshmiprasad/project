@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:firstproject/customs/customwidgets.dart';
 import 'package:firstproject/customs/uicustoms.dart';
 
-import 'package:firstproject/viewmodel/signupcontroller.dart';
+import 'package:firstproject/viewmodel/Authenticationctl/signupcontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

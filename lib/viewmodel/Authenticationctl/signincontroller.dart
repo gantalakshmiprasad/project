@@ -6,13 +6,14 @@ class Signincontroller extends GetxController {
   final TextEditingController emailcontroller = TextEditingController();
   final TextEditingController passwordcontroller = TextEditingController();
   final globalkey = GlobalKey<FormState>();
+  @override
+  void onInit() async {
+    super.onInit();
+    await Get.find<AuthServices>().account.deleteSessions();
+  }
 
   Future<void> signin(String email, String password) async {
-    try {
-      await Get.find<AuthServices>().login(email, password);
-      Get.offAllNamed('/homepage');
-    } catch (e) {
-      throw Exception(e.toString());
-    }
+    await Get.find<AuthServices>().login(email, password);
+    Get.offAllNamed('/homepage');
   }
 }

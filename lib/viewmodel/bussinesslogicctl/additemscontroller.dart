@@ -13,7 +13,8 @@ class Homepagecontroller extends GetxController {
   final errorMessage = ''.obs;
   final TextEditingController prompt = TextEditingController();
   final service = Get.find<AuthServices>();
-  Future<void> clicked(String promptText) async {
+  final userid = ''.obs;
+  Future<void> clicked(String promptText, String price) async {
     try {
       if (promptText.isEmpty) {
         errorMessage.value = 'Please enter a search query';
@@ -32,6 +33,21 @@ class Homepagecontroller extends GetxController {
       final image = jsonDecode(execution.responseBody);
 
       imageurl.value = image['result'];
+      final urltobytes = await Get.find<AuthServices>().urlToBytes(
+        imageurl.value,
+      );
+      final userid = await Get.find<AuthServices>().getaccount();
+      await Get.find<AuthServices>().uploadFileWeb(
+        urltobytes,
+        promptText,
+        userid,
+      );
+      await Get.find<AuthServices>().createEntry({
+        'productName': promptText,
+        'price': price,
+        'imageurl': imageurl.value,
+        'userid': userid,
+      });
     } catch (e) {
       errorMessage.value = 'Error fetching image: $e';
       print(e.toString());

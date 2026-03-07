@@ -4,7 +4,10 @@ class Appcolors {
   final Gradient gradient1 = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF0D9D9D), Color(0xFF1CB5E0)],
+    colors: [
+      Color.fromARGB(255, 12, 131, 235),
+      Color.fromARGB(255, 32, 119, 233),
+    ],
   );
   final Color buttoncolor = Color(0xFF007BFF);
 }

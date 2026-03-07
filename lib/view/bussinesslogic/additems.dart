@@ -1,9 +1,9 @@
-import 'package:firstproject/viewmodel/homepagecontroller.dart';
+import 'package:firstproject/viewmodel/bussinesslogicctl/additemscontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class Homepage extends StatelessWidget {
-  const Homepage({super.key});
+class Additems extends StatelessWidget {
+  const Additems({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class Homepage extends StatelessWidget {
               width: 400,
               child: ElevatedButton(
                 onPressed: () {
-                  controller.clicked(controller.prompt.text.trim().toString());
+                  // controller.clicked(controller.prompt.text.trim().toString());
                 },
                 child: Text('press'),
               ),

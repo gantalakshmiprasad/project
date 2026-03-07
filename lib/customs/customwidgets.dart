@@ -1,44 +1,4 @@
-import 'package:firstproject/customs/uicustoms.dart';
 import 'package:flutter/material.dart';
-
-class Dialogbox extends StatelessWidget {
-  final TextEditingController email;
-  final TextEditingController password;
-  const Dialogbox({super.key, required this.email, required this.password});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 350,
-      width: 350,
-
-      child: Column(
-        children: [
-          SizedBox(height: 20),
-          buildTextField(controller: email, hint: 'email'),
-          SizedBox(height: 20),
-          buildTextField(controller: password, hint: 'password'),
-          SizedBox(height: 50),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.all(20),
-              backgroundColor: Appcolors().buttoncolor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 0,
-            ),
-            onPressed: () {},
-            child: Text(
-              'Enter',
-              style: TextStyle(color: Colors.white, fontSize: 25),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 Widget buildTextField({
   required String hint,
