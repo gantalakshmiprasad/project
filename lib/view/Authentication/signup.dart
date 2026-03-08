@@ -32,10 +32,10 @@ class Signup extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: const Color.fromARGB(141, 255, 255, 255),
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
+                        color: const Color.fromARGB(102, 255, 255, 255),
                         width: 1.5,
                       ),
                     ),

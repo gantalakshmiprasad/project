@@ -17,6 +17,7 @@ class LoginScreen extends StatelessWidget {
       body: Container(
         // Background Gradient
         decoration: BoxDecoration(gradient: Appcolors().gradient1),
+
         child: Center(
           child: SizedBox(
             width: 500,
@@ -31,12 +32,9 @@ class LoginScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white30,
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
-                        width: 1.5,
-                      ),
+                      border: Border.all(color: Colors.white30, width: 1.5),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

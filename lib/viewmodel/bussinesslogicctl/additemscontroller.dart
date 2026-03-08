@@ -7,7 +7,7 @@ import 'package:firstproject/model/authservices.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class Homepagecontroller extends GetxController {
+class Additemcontroller extends GetxController {
   final isDownloading = false.obs;
   final imageurl = ''.obs;
   final errorMessage = ''.obs;
