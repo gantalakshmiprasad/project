@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 Widget buildTextField({
@@ -39,19 +41,21 @@ class ItemCard extends StatelessWidget {
   final VoidCallback onBuyPressed;
   final VoidCallback decrease;
   final VoidCallback increase;
-  final String uniqueId; // Use this as a tag for the controller
+
   final bool available;
+  //final Uint8List imageurl;
   const ItemCard({
     super.key,
     // required this.imageUrl,
     required this.itemName,
     required this.price,
     required this.onBuyPressed,
-    required this.uniqueId,
+
     required this.available,
     required this.decrease,
     required this.increase,
     required this.quantity,
+    //  required this.imageurl,
   });
 
   @override
@@ -68,7 +72,7 @@ class ItemCard extends StatelessWidget {
         width: 200,
         child: Column(
           children: [
-            // ClipRRect(child: Image.memory(imageUrl)),
+            //Flexible(child: ClipRect(child: Image.memory(imageurl))),
             SizedBox(height: 150, width: 150),
             Text(
               'Price : $price /-',

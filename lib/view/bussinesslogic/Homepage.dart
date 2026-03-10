@@ -15,49 +15,55 @@ class Homepage extends StatelessWidget {
     return Scaffold(
       appBar: appbar(),
       body: Obx(() {
-        return Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: SizedBox(
-            height: Get.height,
-            width: Get.width * 0.80,
-
-            child: Stack(
-              alignment: AlignmentGeometry.bottomRight,
+        return Row(
+          children: [
+            Stack(
+              alignment: Alignment.bottomRight,
               children: [
-                SingleChildScrollView(
-                  child: Container(
-                    height: Get.height,
-                    width: Get.width,
-                    color: Colors.white38,
-                    child: Row(
-                      children: [
-                        ItemCard(
-                          itemName: 'itemName',
-                          price: 50,
-                          onBuyPressed: () {},
-                          uniqueId: 'uniqueId',
-                          available: true,
-                          decrease: () {},
-                          increase: () {},
-                          quantity: 0,
-                        ),
-                      ],
-                    ),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
                   ),
+                  width: Get.width * 0.75,
+                  height: Get.height,
+                  child: controller.database.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: controller.database.length,
+                          itemBuilder: (context, index) {
+                            final product = controller.database[0];
+
+                            return Text('Data received $product');
+                          },
+                        )
+                      : Center(
+                          child: Defaultext(
+                            text: 'No data',
+                            size: 55,
+                            color: Colors.red,
+                          ),
+                        ),
                 ),
-                controller.addclicked.value
-                    ? Center(
-                        child: SizedBox(
+                controller.isimageclicked.value
+                    ? Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          height: 350,
                           width: 500,
-                          child: controller.isimageclicked.value
-                              ? displayimage(controller)
-                              : itemform(controller),
+                          padding: const EdgeInsets.all(8.0),
+                          child: itemform(controller),
                         ),
                       )
-                    : addbutton(controller),
+                    : Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: addbutton(controller),
+                        ),
+                      ),
               ],
             ),
-          ),
+            SizedBox(child: Text('print area  ')),
+          ],
         );
       }),
     );
@@ -96,11 +102,11 @@ Padding addbutton(Homepagecontroller controller) {
       children: [
         Text('Press + to add items', style: TextStyle(color: Colors.black54)),
         SizedBox(width: 15),
-        IconButton.filled(
+        FloatingActionButton(
           onPressed: () {
-            controller.addclicked.value = true;
+            controller.opendialog();
           },
-          icon: Icon(Icons.add, weight: 5.0),
+          child: Icon(Icons.add),
         ),
       ],
     ),
@@ -127,7 +133,7 @@ Stack itemform(Homepagecontroller controller) {
         padding: EdgeInsets.all(25),
         focusColor: Colors.transparent,
         onPressed: () {
-          controller.addclicked.value = false;
+          controller.closedialog();
         },
         icon: Icon(Icons.cancel),
       ),
@@ -136,34 +142,3 @@ Stack itemform(Homepagecontroller controller) {
 }
 
 ////////////////////////////////////////////////////
-
-Stack displayimage(Homepagecontroller controller) {
-  return Stack(
-    alignment: Alignment.topRight,
-    children: [
-      Container(
-        padding: EdgeInsets.all(25),
-        height: 400,
-        width: 800,
-        decoration: BoxDecoration(
-          color: Colors.amber,
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(controller.imageurl.value, height: 200, width: 220),
-          ],
-        ),
-      ),
-      IconButton(
-        padding: EdgeInsets.all(25),
-        focusColor: Colors.transparent,
-        onPressed: () {
-          controller.isimageclicked.value = false;
-        },
-        icon: Icon(Icons.cancel),
-      ),
-    ],
-  );
-}

@@ -32,9 +32,12 @@ class LoginScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                      color: Colors.white30,
+                      color: const Color.fromARGB(23, 255, 255, 255),
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.white30, width: 1.5),
+                      border: Border.all(
+                        color: const Color.fromARGB(33, 255, 255, 255),
+                        width: 1.5,
+                      ),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

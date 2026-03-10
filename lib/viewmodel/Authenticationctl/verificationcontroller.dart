@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
 
-import 'package:firstproject/model/authservices.dart';
+import 'package:firstproject/services/authservices.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

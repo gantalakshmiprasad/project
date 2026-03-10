@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../model/authservices.dart';
+import '../../services/authservices.dart';
 
 class ResetPasswordController extends GetxController {
   final TextEditingController newPasswordController = TextEditingController();

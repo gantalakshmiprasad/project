@@ -1,4 +1,4 @@
-import 'package:firstproject/model/authservices.dart';
+import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/view/Authentication/forgotpassword.dart';
 import 'package:firstproject/view/bussinesslogic/Homepage.dart';
 import 'package:firstproject/view/Authentication/resetpassword.dart';

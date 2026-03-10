@@ -1,4 +1,5 @@
-import 'package:firstproject/model/authservices.dart';
+import 'package:firstproject/services/authservices.dart';
+import 'package:firstproject/services/databaseservice.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,12 +8,14 @@ class Signupcontroller extends GetxController {
   final TextEditingController passwordcontroller = TextEditingController();
   final TextEditingController usernamecontroller = TextEditingController();
   final globalkey = GlobalKey<FormState>();
-
+  final Databaseservice dbservices = Get.find<Databaseservice>();
+  final AuthServices authservice = Get.find<AuthServices>();
   Future<void> signup(String name, String email, String password) async {
     try {
-      await Get.find<AuthServices>().signup(name, email, password);
-      await Get.find<AuthServices>().login(email, password);
-      await Get.find<AuthServices>().createemailverification(
+      await authservice.signup(name, email, password);
+      await authservice.login(email, password);
+      await dbservices.createEntry({'name': name, 'email': email});
+      await authservice.createemailverification(
         'http://localhost:3030/#/verificationpage',
       );
 
