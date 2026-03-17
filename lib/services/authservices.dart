@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 
 import 'package:firstproject/customs/config.dart';
 import 'package:flutter/material.dart';
@@ -19,10 +20,10 @@ class AuthServices extends GetxService {
     try {
       client = Client()
           .setEndpoint(ApiConfig().apiendpoint) // e.g. 'http://localhost/v1'
-          .setProject(ApiConfig().projectid); // your project ID
+          .setProject(ApiConfig().projectid);
 
       account = Account(client);
-
+      print("client:${client.endPoint}");
       function = Functions(client);
     } catch (e) {
       throw Get.snackbar(
@@ -95,10 +96,10 @@ class AuthServices extends GetxService {
     }
   }
 
-  Future<String> getaccount() async {
+  Future<User> getaccount() async {
     try {
       final user = await account.get();
-      return user.$id;
+      return user;
     } catch (e) {
       throw Exception(e.toString());
     }

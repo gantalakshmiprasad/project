@@ -1,7 +1,8 @@
 // ignore_for_file: file_names
 
+import 'dart:typed_data';
+
 import 'package:firstproject/customs/customwidgets.dart';
-import 'package:firstproject/customs/uicustoms.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,41 +14,88 @@ class Homepage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(Homepagecontroller());
     return Scaffold(
-      appBar: appbar(),
+      appBar: appbar(controller),
       body: Obx(() {
+        if (controller.isloading.value) {
+          return Center(child: CircularProgressIndicator(color: Colors.green));
+        }
+
         return Row(
           children: [
             Stack(
               alignment: Alignment.bottomRight,
               children: [
                 Container(
+                  height: double.infinity,
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.blue,
+                        const Color.fromARGB(231, 46, 115, 252),
+                      ],
+
+                      // Optional: stops defines where each color starts (0.0 to 1.0)
+                    ),
                   ),
                   width: Get.width * 0.75,
-                  height: Get.height,
-                  child: controller.database.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: controller.database.length,
-                          itemBuilder: (context, index) {
-                            final product = controller.database[0];
 
-                            return Text('Data received $product');
+                  child: controller.database.isNotEmpty
+                      ? GridView.builder(
+                          itemCount: controller.database.length,
+                          shrinkWrap: true,
+
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 6,
+                                childAspectRatio: 0.7,
+                              ),
+                          itemBuilder: (context, index) {
+                            final data = controller.database[index]['data'];
+                            final rowid = controller.database[index]['id'];
+                            final quantity =
+                                controller.database[index]['quantity'];
+                            final Uint8List image =
+                                controller.storedimages[index]['fileid'] ==
+                                    data['fileid']
+                                ? controller.storedimages[index]['image']
+                                : null;
+                            return ItemCard(
+                              itemName: data['itemname'],
+                              price: data['itemprice'],
+
+                              available: data['isavailable'],
+                              decrease: () {
+                                controller.decreasequantity(rowid);
+                              },
+                              increase: () {
+                                controller.increasequantity(rowid);
+                              },
+                              quantity: quantity,
+                              imageurl: image,
+                              onedit: () => controller.onedit(
+                                rowid ?? 'No information',
+                                data['isavailable'] as bool,
+                                data['itemname'],
+                              ),
+                            );
                           },
                         )
                       : Center(
                           child: Defaultext(
                             text: 'No data',
                             size: 55,
-                            color: Colors.red,
+                            color: Colors.green,
                           ),
                         ),
                 ),
-                controller.isimageclicked.value
+                controller.addclicked.value
                     ? Align(
                         alignment: Alignment.center,
                         child: Container(
-                          height: 350,
+                          height: 370,
                           width: 500,
                           padding: const EdgeInsets.all(8.0),
                           child: itemform(controller),
@@ -69,76 +117,3 @@ class Homepage extends StatelessWidget {
     );
   }
 }
-
-///////////////////////////////////////////////////////
-AppBar appbar() {
-  return AppBar(
-    backgroundColor: Appcolors().buttoncolor,
-    title: Text(
-      'UBS',
-      style: TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: 35,
-      ),
-    ),
-    actions: [
-      IconButton(
-        onPressed: () {
-          Get.offAllNamed('/');
-        },
-        icon: Icon(Icons.logout, color: Colors.white),
-      ),
-    ],
-  );
-}
-//////////////////////////////////////////////////
-
-Padding addbutton(Homepagecontroller controller) {
-  return Padding(
-    padding: const EdgeInsets.all(25),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text('Press + to add items', style: TextStyle(color: Colors.black54)),
-        SizedBox(width: 15),
-        FloatingActionButton(
-          onPressed: () {
-            controller.opendialog();
-          },
-          child: Icon(Icons.add),
-        ),
-      ],
-    ),
-  );
-}
-
-///////////////////////////////////////////////////////////
-
-Stack itemform(Homepagecontroller controller) {
-  return Stack(
-    alignment: AlignmentGeometry.topRight,
-    children: [
-      Itemdialog(
-        namecontroller: controller.namecontroller,
-        pricecontroller: controller.pricecontroller,
-        submit: () {
-          controller.submit(
-            controller.namecontroller.text.trim(),
-            controller.pricecontroller.text.trim(),
-          );
-        },
-      ),
-      IconButton(
-        padding: EdgeInsets.all(25),
-        focusColor: Colors.transparent,
-        onPressed: () {
-          controller.closedialog();
-        },
-        icon: Icon(Icons.cancel),
-      ),
-    ],
-  );
-}
-
-////////////////////////////////////////////////////

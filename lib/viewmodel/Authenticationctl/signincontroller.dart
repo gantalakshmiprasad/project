@@ -6,6 +6,7 @@ class Signincontroller extends GetxController {
   final TextEditingController emailcontroller = TextEditingController();
   final TextEditingController passwordcontroller = TextEditingController();
   final globalkey = GlobalKey<FormState>();
+
   @override
   void onInit() async {
     super.onInit();

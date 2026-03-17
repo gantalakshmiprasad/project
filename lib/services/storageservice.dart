@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:typed_data';
 
 import 'package:appwrite/appwrite.dart';
@@ -5,6 +7,7 @@ import 'package:appwrite/models.dart' as models;
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class Storageservice extends GetxService {
@@ -19,11 +22,7 @@ class Storageservice extends GetxService {
     table = TablesDB(client);
   }
 
-  Future<String?> uploadFileWeb(
-    Uint8List fileBytes,
-    String fileName,
-    String userid,
-  ) async {
+  Future<String> uploadFileWeb(Uint8List fileBytes, String fileName) async {
     try {
       final result = await storage.createFile(
         bucketId: ApiConfig().bucketId,
@@ -58,6 +57,19 @@ class Storageservice extends GetxService {
     } catch (e) {
       Exception('List Error: $e');
       return null;
+    }
+  }
+
+  Future<Uint8List> getfile(String fileId) async {
+    try {
+      final fileBytes = await storage.getFileDownload(
+        bucketId: ApiConfig().bucketId,
+        fileId: fileId,
+      );
+      return fileBytes;
+    } catch (e) {
+      print('Error in submit: $e');
+      throw Exception('File retrieval error: ${e.toString()}');
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,10 @@ class Signupcontroller extends GetxController {
     try {
       await authservice.signup(name, email, password);
       await authservice.login(email, password);
-      await dbservices.createEntry({'name': name, 'email': email});
+      await dbservices.createEntry({
+        'name': name,
+        'email': email,
+      }, ApiConfig().collectionId);
       await authservice.createemailverification(
         'http://localhost:3030/#/verificationpage',
       );
