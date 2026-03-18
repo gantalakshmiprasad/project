@@ -56,9 +56,7 @@ class Homepagecontroller extends GetxController {
           .stream
           .listen((event) {
             print(event.channels);
-            Future.delayed(Duration(milliseconds: 300), () {
-              refreshDatabase();
-            });
+            refreshDatabase();
           });
     } catch (e) {
       throw Exception(e.toString());
