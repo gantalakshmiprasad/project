@@ -64,10 +64,11 @@ class Homepagecontroller extends GetxController {
       closedialog();
       isloading.value = true;
 
-      final user = await authservice.getaccount();
-      final fileid = await clicked(promptText);
+      final user = await authservice.getaccount(); //getting userid
+      final fileid = await clicked(promptText); //getting fileid from function
 
       final product = Product(
+        //this the product
         id: '', // leave empty, Appwrite will generate $id
         itemname: promptText,
         itemprice: price, // keep as string
@@ -76,20 +77,21 @@ class Homepagecontroller extends GetxController {
         isavailable: true,
       );
 
-      await dbservice.createEntry(product.toMap(), ApiConfig().productmodel);
+      final created = await dbservice.createEntry(
+        product.toMap(),
+        ApiConfig().productmodel,
+      ); //now the product is stored in db
 
-      final RowList rowlist = await dbservice.fetchdata(user.$id);
-      database.clear();
-      storedimages.clear();
-      for (var row in rowlist.rows) {
-        final item = (Product.fromMap(row.data));
-        print(item);
-        final image = await storageservice.getfile(item.fileid);
-        storedimages.add({'fileid': item.fileid, 'image': image});
+      final newItem = Product.fromMap(created);
+      final image = await storageservice.getfile(newItem.fileid);
 
-        database.add({'id': row.$id, 'data': item, 'quantity': 0});
-        database.refresh();
-      }
+      storedimages.add({'fileid': newItem.fileid, 'image': image});
+      database.add({
+        'id': created['\$id'],
+        'data': newItem.toMap(),
+        'quantity': 0,
+      });
+      database.refresh();
     } catch (e) {
       print('Error in homepagectl: $e');
       Exception(e.toString());
