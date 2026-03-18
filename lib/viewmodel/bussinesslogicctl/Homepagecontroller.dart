@@ -79,6 +79,8 @@ class Homepagecontroller extends GetxController {
       await dbservice.createEntry(product.toMap(), ApiConfig().productmodel);
 
       final RowList rowlist = await dbservice.fetchdata(user.$id);
+      database.clear();
+      storedimages.clear();
       for (var row in rowlist.rows) {
         final item = (Product.fromMap(row.data));
         print(item);
