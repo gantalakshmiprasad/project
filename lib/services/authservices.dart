@@ -11,7 +11,7 @@ import 'package:get/state_manager.dart';
 class AuthServices extends GetxService {
   late final Client client;
   late final Account account;
-
+  late Realtime realtime;
   late final Functions function;
 
   @override
@@ -23,8 +23,9 @@ class AuthServices extends GetxService {
           .setProject(ApiConfig().projectid);
 
       account = Account(client);
-      print("client:${client.endPoint}");
+
       function = Functions(client);
+      realtime = Realtime(client);
     } catch (e) {
       throw Get.snackbar(
         'Error',

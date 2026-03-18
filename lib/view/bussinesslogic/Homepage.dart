@@ -58,10 +58,8 @@ class Homepage extends StatelessWidget {
                             final quantity =
                                 controller.database[index]['quantity'];
                             final Uint8List image =
-                                controller.storedimages[index]['fileid'] ==
-                                    data['fileid']
-                                ? controller.storedimages[index]['image']
-                                : null;
+                                controller.database[index]['image'];
+
                             return ItemCard(
                               itemName: data['itemname'],
                               price: data['itemprice'],

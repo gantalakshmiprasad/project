@@ -37,38 +37,41 @@ class Homepagecontroller extends GetxController {
   void onInit() async {
     super.onInit();
     isloading.value = true;
-    final userid = await authservice.getaccount();
-
-    final RowList rowlist = await dbservice.fetchdata(userid.$id);
-    for (var row in rowlist.rows) {
-      final item = (Product(
-        id: row.data['\$id'],
-        itemname: row.data['itemname'],
-        itemprice: row.data['itemprice'],
-        userid: row.data['userid'],
-        fileid: row.data['fileid'],
-        isavailable: row.data['isavailable'],
-      ));
-      final image = await storageservice.getfile(item.fileid);
-      storedimages.add({'fileid': item.fileid, 'image': image});
-
-      database.add({'id': row.$id, 'data': item.toMap(), 'quantity': 0});
-    }
-
+    await refreshDatabase();
+    // 2. Subscribe to Realtime Changes
+    listener();
     isloading.value = false;
     // If you want to bind to your observable list:
+  }
+
+  Future<void> listener() async {
+    try {
+      final realtime = authservice
+          .realtime; // Ensure Realtime is initialized in your service
+
+      realtime
+          .subscribe([
+            'databases.${ApiConfig().databaseId}.collections.${ApiConfig().productmodel}.documents',
+          ])
+          .stream
+          .listen((event) {
+            print(event.channels);
+            Future.delayed(Duration(milliseconds: 300), () {
+              refreshDatabase();
+            });
+          });
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 
   Future<void> submit(String promptText, String price) async {
     try {
       closedialog();
       isloading.value = true;
-
       final user = await authservice.getaccount(); //getting userid
       final fileid = await clicked(promptText); //getting fileid from function
-
       final product = Product(
-        //this the product
         id: '', // leave empty, Appwrite will generate $id
         itemname: promptText,
         itemprice: price, // keep as string
@@ -76,49 +79,26 @@ class Homepagecontroller extends GetxController {
         fileid: fileid,
         isavailable: true,
       );
-
-      final created = await dbservice.createEntry(
-        product.toMap(),
-        ApiConfig().productmodel,
-      ); //now the product is stored in db
-
-      final newItem = Product.fromMap(created);
-      final image = await storageservice.getfile(newItem.fileid);
-
-      storedimages.add({'fileid': newItem.fileid, 'image': image});
-      database.add({
-        'id': created['\$id'],
-        'data': newItem.toMap(),
-        'quantity': 0,
-      });
-      database.refresh();
+      await dbservice.createEntry(product.toMap(), ApiConfig().productmodel);
     } catch (e) {
       print('Error in homepagectl: $e');
       Exception(e.toString());
     } finally {
+      database.refresh();
       isloading.value = false;
     }
   }
 
   Future<String> clicked(String promptText) async {
-    //this is the function to generate an image,
-
     try {
-      //1.It calls the function from the appwrite and returns json object,anything
-      //output comes from the remote source is json
       final execution = await authservice.function.createExecution(
         functionId: ApiConfig().functionid,
         method: ExecutionMethod.pOST,
-
         body: '{"prompt":"$promptText"}',
       );
-
       final Map<String, dynamic> image = jsonDecode(execution.responseBody);
-
-      //2.I passed the json data of image to upload in the appwrite storage
       final urltobytes = await storageservice.urlToBytes(image['result']);
       final fileid = await storageservice.uploadFileWeb(urltobytes, promptText);
-
       return fileid;
     } catch (e) {
       print(e.toString());
@@ -182,6 +162,32 @@ class Homepagecontroller extends GetxController {
         item['quantity'] = item['quantity'] - 1;
         database.refresh();
       }
+    }
+  }
+
+  Future<void> refreshDatabase() async {
+    try {
+      database.clear();
+      final user = await authservice.getaccount();
+      final RowList rowlist = await dbservice.fetchdata(user.$id);
+
+      final freshdata = [];
+      for (var row in rowlist.rows) {
+        final item = Product.fromMap(row.data);
+        final image = await storageservice.getfile(item.fileid);
+        freshdata.add({
+          'id': row.$id,
+          'data': item.toMap(),
+          'quantity': 0,
+          'image': image,
+        });
+      }
+      database.assignAll(freshdata);
+      print(database.length);
+    } catch (e) {
+      print("Error refreshing database: $e");
+    } finally {
+      database.refresh();
     }
   }
 

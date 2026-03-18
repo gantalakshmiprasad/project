@@ -111,6 +111,8 @@ class Databaseservice extends GetxService {
         tableId: ApiConfig().productmodel,
         queries: [
           Query.equal('userid', [userId]),
+          Query.limit(100),
+          Query.orderDesc('\$createdAt'),
         ],
       );
       return data;
