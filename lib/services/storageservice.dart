@@ -7,7 +7,6 @@ import 'package:appwrite/models.dart' as models;
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class Storageservice extends GetxService {
