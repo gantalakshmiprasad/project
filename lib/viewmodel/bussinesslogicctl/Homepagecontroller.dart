@@ -54,9 +54,41 @@ class Homepagecontroller extends GetxController {
             'databases.${ApiConfig().databaseId}.collections.${ApiConfig().productmodel}.documents',
           ])
           .stream
-          .listen((event) {
-            print(event.channels);
-            refreshDatabase();
+          .listen((event) async {
+            final String eventType = event.events.first;
+            final Map<String, dynamic> payload = event.payload;
+            final String docId = payload['\$id'];
+
+            // 1. ADD NEW ITEM
+            if (eventType.contains('.create')) {
+              final newItem = Product.fromMap(payload);
+              // Fetch image only for the new item
+              final image = await storageservice.getfile(newItem.fileid);
+
+              database.add({
+                'id': docId,
+                'data': newItem.toMap(),
+                'quantity': 0,
+                'image': image,
+              });
+            }
+            // 2. UPDATE EXISTING ITEM (e.g., price change or availability)
+            else if (eventType.contains('.update')) {
+              final index = database.indexWhere(
+                (element) => element['id'] == docId,
+              );
+              if (index != -1) {
+                final updatedProduct = Product.fromMap(payload);
+
+                // Update only the data part, keep the existing image and quantity
+                database[index]['data'] = updatedProduct.toMap();
+                database.refresh(); // Tells GetX to redraw this specific item
+              }
+            }
+            // 3. REMOVE ITEM
+            else if (eventType.contains('.delete')) {
+              database.removeWhere((element) => element['id'] == docId);
+            }
           });
     } catch (e) {
       throw Exception(e.toString());

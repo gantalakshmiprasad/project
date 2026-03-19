@@ -49,7 +49,7 @@ class Homepage extends StatelessWidget {
 
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 6,
+                                crossAxisCount: 7,
                                 childAspectRatio: 0.7,
                               ),
                           itemBuilder: (context, index) {
