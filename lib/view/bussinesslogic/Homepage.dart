@@ -61,6 +61,7 @@ class Homepage extends StatelessWidget {
                                 controller.database[index]['image'];
 
                             return ItemCard(
+                              key: ValueKey(rowid),
                               itemName: data['itemname'],
                               price: data['itemprice'],
 
