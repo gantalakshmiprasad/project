@@ -6,6 +6,7 @@ import 'package:firstproject/customs/customwidgets.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Homepage extends StatelessWidget {
   const Homepage({super.key});
@@ -16,10 +17,6 @@ class Homepage extends StatelessWidget {
     return Scaffold(
       appBar: appbar(controller),
       body: Obx(() {
-        if (controller.isloading.value) {
-          return Center(child: CircularProgressIndicator(color: Colors.green));
-        }
-
         return Row(
           children: [
             Stack(
@@ -28,18 +25,7 @@ class Homepage extends StatelessWidget {
                 Container(
                   height: double.infinity,
                   padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.blue,
-                        const Color.fromARGB(231, 46, 115, 252),
-                      ],
-
-                      // Optional: stops defines where each color starts (0.0 to 1.0)
-                    ),
-                  ),
+                  decoration: BoxDecoration(color: Color(0xFFECEFF1)),
                   width: Get.width * 0.75,
 
                   child: controller.database.isNotEmpty
@@ -82,12 +68,34 @@ class Homepage extends StatelessWidget {
                             );
                           },
                         )
-                      : Center(
-                          child: Defaultext(
-                            text: 'No data',
-                            size: 55,
-                            color: Colors.green,
-                          ),
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            controller.isloading.value
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          color: Colors.green,
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Items are loading...',
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Center(
+                                    child: Defaultext(
+                                      text: 'No data',
+                                      size: 55,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                          ],
                         ),
                 ),
                 controller.addclicked.value

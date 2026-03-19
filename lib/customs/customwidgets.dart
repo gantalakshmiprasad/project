@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget buildTextField({
   required String hint,
@@ -71,7 +72,7 @@ class ItemCard extends StatelessWidget {
       children: [
         Card(
           elevation: 15,
-          color: quantity > 0 ? Colors.amber : Colors.white,
+          color: quantity > 0 ? Colors.orange : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(25),
             side: BorderSide(color: available ? Colors.green : Colors.red),
@@ -98,12 +99,13 @@ class ItemCard extends StatelessWidget {
                   children: [
                     AutoSizeText(
                       itemName,
-
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1F1F1F),
                       ),
-                      maxLines: 3,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       minFontSize: 10, // smallest font size allowed
                       maxFontSize: 18, // largest font size allowed
@@ -113,7 +115,7 @@ class ItemCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: available ? Colors.green : Colors.red,
+                        color: available ? Color(0xFF009688) : Colors.red,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -297,12 +299,12 @@ Stack itemform(Homepagecontroller controller) {
 
 AppBar appbar(Homepagecontroller controller) {
   return AppBar(
-    backgroundColor: const Color.fromARGB(219, 27, 136, 252),
+    backgroundColor: Color(0xFF263238),
 
     title: Text(
       'UBS',
       style: TextStyle(
-        color: Colors.black,
+        color: Colors.white,
         fontWeight: FontWeight.bold,
         fontSize: 35,
       ),
@@ -315,7 +317,7 @@ AppBar appbar(Homepagecontroller controller) {
 
           Get.offAllNamed('/');
         },
-        icon: Icon(Icons.logout, color: Colors.black),
+        icon: Icon(Icons.logout, color: Colors.white),
       ),
     ],
   );

@@ -39,7 +39,7 @@ class Homepagecontroller extends GetxController {
     isloading.value = true;
     await refreshDatabase();
     // 2. Subscribe to Realtime Changes
-    listener();
+
     isloading.value = false;
     // If you want to bind to your observable list:
   }
@@ -54,8 +54,9 @@ class Homepagecontroller extends GetxController {
             'databases.${ApiConfig().databaseId}.collections.${ApiConfig().productmodel}.documents',
           ])
           .stream
-          .listen((event) async {
-            final String eventType = event.events.first;
+          .listen((event) {
+            refreshDatabase();
+            /* final String eventType = event.events.first;
             final Map<String, dynamic> payload = event.payload;
             final String docId = payload['\$id'];
 
@@ -88,7 +89,7 @@ class Homepagecontroller extends GetxController {
             // 3. REMOVE ITEM
             else if (eventType.contains('.delete')) {
               database.removeWhere((element) => element['id'] == docId);
-            }
+            } */
           });
     } catch (e) {
       throw Exception(e.toString());
@@ -99,6 +100,12 @@ class Homepagecontroller extends GetxController {
     try {
       closedialog();
       isloading.value = true;
+      Get.defaultDialog(
+        content: CircularProgressIndicator(color: Colors.green),
+        title: 'Adding $promptText',
+        titleStyle: TextStyle(color: Colors.white),
+        backgroundColor: Color(0xFF263238),
+      );
       final user = await authservice.getaccount(); //getting userid
       final fileid = await clicked(promptText); //getting fileid from function
       final product = Product(
@@ -109,13 +116,15 @@ class Homepagecontroller extends GetxController {
         fileid: fileid,
         isavailable: true,
       );
+
       await dbservice.createEntry(product.toMap(), ApiConfig().productmodel);
     } catch (e) {
       print('Error in homepagectl: $e');
       Exception(e.toString());
     } finally {
-      database.refresh();
+      await refreshDatabase();
       isloading.value = false;
+      Get.back();
     }
   }
 
@@ -137,11 +146,16 @@ class Homepagecontroller extends GetxController {
   }
 
   Future<void> onedit(String rowid, bool isavailable, String itemname) async {
-    if (rowid == 'No information') {
-      print('No information about userid:$userid');
-      return;
-    }
     try {
+      isloading.value = true;
+      Get.defaultDialog(
+        title: isavailable ? 'Sold out' : 'Available',
+        content: isavailable
+            ? Text('$itemname is Sold out')
+            : Text('$itemname is available now'),
+        titleStyle: TextStyle(color: Colors.black),
+        backgroundColor: isavailable ? Colors.red : Colors.green,
+      );
       final item = await dbservice.getEntries(rowid);
       await dbservice.updateEntry(rowid, {
         ...item,
@@ -152,14 +166,12 @@ class Homepagecontroller extends GetxController {
         database[index]['data']['isavailable'] = !isavailable;
         database.refresh();
       }
-      Get.snackbar(
-        isavailable ? 'Sold out' : 'Available',
-        isavailable ? '$itemname is Sold out' : '$itemname is available now',
-        colorText: Colors.black,
-        backgroundColor: isavailable ? Colors.red : Colors.green,
-      );
     } catch (e) {
       throw Exception(e.toString());
+    } finally {
+      await refreshDatabase();
+      isloading.value = false;
+      Get.back();
     }
   }
 
@@ -197,7 +209,6 @@ class Homepagecontroller extends GetxController {
 
   Future<void> refreshDatabase() async {
     try {
-      database.clear();
       final user = await authservice.getaccount();
       final RowList rowlist = await dbservice.fetchdata(user.$id);
 
@@ -212,8 +223,8 @@ class Homepagecontroller extends GetxController {
           'image': image,
         });
       }
+      database.clear();
       database.assignAll(freshdata);
-      print(database.length);
     } catch (e) {
       print("Error refreshing database: $e");
     } finally {
