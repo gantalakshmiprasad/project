@@ -3,6 +3,7 @@
 import 'dart:typed_data';
 
 import 'package:firstproject/customs/customwidgets.dart';
+import 'package:firstproject/view/bussinesslogic/print.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -116,7 +117,12 @@ class Homepage extends StatelessWidget {
                       ),
               ],
             ),
-            SizedBox(child: Text('print area  ')),
+            Container(
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(color: Colors.white54),
+              width: Get.width * 0.25,
+              child: Printitems(),
+            ),
           ],
         );
       }),

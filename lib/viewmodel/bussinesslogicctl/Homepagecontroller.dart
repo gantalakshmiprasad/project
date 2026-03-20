@@ -4,10 +4,12 @@ import 'dart:convert';
 import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
 import 'package:firstproject/customs/config.dart';
+import 'package:firstproject/model/billmodel.dart';
 import 'package:firstproject/model/itemModel.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:firstproject/services/storageservice.dart';
+import 'package:firstproject/viewmodel/bussinesslogicctl/printcontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,8 +19,7 @@ class Homepagecontroller extends GetxController {
   final RxList storedimages = [].obs;
   final RxBool addclicked = false.obs;
   final isloading = false.obs;
-
-  final RxInt quantity = 0.obs;
+  final printcontroller = Get.put(Printcontroller());
   final userid = ''.obs;
   final GlobalKey<FormState> formkey = GlobalKey<FormState>();
   final RxBool isimageclicked = false.obs;
@@ -192,17 +193,60 @@ class Homepagecontroller extends GetxController {
   void increasequantity(String id) async {
     for (var item in database) {
       if (item['id'] == id) {
-        item['quantity'] = item['quantity'] + 1;
+        item['quantity']++;
+
+        // 2. Sync with the printcontroller.bills list
+        // Find if the item already exists in the bills list
+        var existingBillIndex = printcontroller.bills.indexWhere(
+          (bill) => bill.id == id,
+        );
+
+        if (existingBillIndex != -1) {
+          // If it exists, increment the quantity of the existing bill object
+          printcontroller.bills[existingBillIndex].quantity++;
+        } else {
+          // If it doesn't exist, create it from the updated item and add it
+          final purchaseditem = Billmodel.fromMap(item);
+          print(item);
+          printcontroller.bills.add(purchaseditem.toMap());
+        }
+
+        // 3. Notify the UI
         database.refresh();
+        printcontroller.bills
+            .refresh(); // Assuming bills is also an RxList/Observable
+
+        break; // Optimization: stop looking once the item is found
       }
     }
   }
 
   void decreasequantity(String id) async {
     for (var item in database) {
-      if (item['id'] == id && item['quantity'] > 0) {
-        item['quantity'] = item['quantity'] - 1;
+      if (item['id'] == id) {
+        item['quantity']++;
+
+        // 2. Sync with the printcontroller.bills list
+        // Find if the item already exists in the bills list
+        var existingBillIndex = printcontroller.bills.indexWhere(
+          (bill) => bill.id == id,
+        );
+
+        if (existingBillIndex != -1) {
+          // If it exists, increment the quantity of the existing bill object
+          printcontroller.bills[existingBillIndex].quantity--;
+        } else {
+          // If it doesn't exist, create it from the updated item and add it
+          final purchaseditem = Billmodel.fromMap(item);
+          printcontroller.bills.add(purchaseditem.toMap());
+        }
+
+        // 3. Notify the UI
         database.refresh();
+        printcontroller.bills
+            .refresh(); // Assuming bills is also an RxList/Observable
+
+        break; // Optimization: stop looking once the item is found
       }
     }
   }
