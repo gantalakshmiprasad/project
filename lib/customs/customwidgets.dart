@@ -252,17 +252,18 @@ class Defaultext extends StatelessWidget {
 Padding addbutton(Homepagecontroller controller) {
   return Padding(
     padding: const EdgeInsets.all(25),
-    child: Row(
+    child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text('Press + to add items', style: TextStyle(color: Colors.black54)),
         SizedBox(width: 15),
         FloatingActionButton(
+          backgroundColor: Colors.amber,
           onPressed: () {
             controller.opendialog();
           },
           child: Icon(Icons.add),
         ),
+        SizedBox(height: 2),
       ],
     ),
   );

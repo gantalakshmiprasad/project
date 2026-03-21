@@ -42,7 +42,7 @@ class Homepage extends StatelessWidget {
                             final data = controller.database[index]['data'];
                             final rowid = controller.database[index]['id'];
                             final quantity =
-                                controller.database[index]['quantity'];
+                                controller.database[index]['data']['quantity'];
                             final Uint8List image =
                                 controller.database[index]['image'];
 

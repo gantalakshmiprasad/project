@@ -104,11 +104,11 @@ class Databaseservice extends GetxService {
     }
   }
 
-  Future<RowList> fetchdata(String userId) async {
+  Future<RowList> fetchdata(String userId, String tableid) async {
     try {
       final data = await table.listRows(
         databaseId: ApiConfig().databaseId,
-        tableId: ApiConfig().productmodel,
+        tableId: tableid,
         queries: [
           Query.equal('userid', [userId]),
           Query.limit(100),

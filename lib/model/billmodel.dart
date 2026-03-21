@@ -19,21 +19,20 @@ class Billmodel {
       'itemname': itemname,
       'itemprice': itemprice,
       'quantity': quantity,
-      'amount': amount,
+      'amount': itemprice * quantity,
     };
   }
 
   factory Billmodel.fromMap(Map<String, dynamic> map) {
     // 1. Safely parse price (handles String or num)
-    final double price =
-        double.tryParse(map['data']['itemprice'].toString()) ?? 0.0;
+    final double price = double.tryParse(map['itemprice'].toString()) ?? 0.0;
 
     // 2. Safely parse quantity
     final int qty = int.tryParse(map['quantity'].toString()) ?? 0;
 
     return Billmodel(
-      id: map['id'],
-      itemname: map['data']['itemname'] ?? 'Unknown Item',
+      id: map['\$id'],
+      itemname: map['itemname'],
       itemprice: price,
       quantity: qty,
       amount: price * qty, // Calculate amount once here

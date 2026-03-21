@@ -10,6 +10,8 @@ class Product {
   final DateTime? updatedAt; // $updatedAt (datetime)
   final String fileid;
   final bool isavailable;
+  final int quantity;
+
   Product({
     required this.id,
     required this.itemname,
@@ -20,6 +22,7 @@ class Product {
     this.updatedAt,
     required this.fileid,
     this.isavailable = true,
+    required this.quantity,
   });
 
   // Convert Product to Map (for Appwrite or JSON)
@@ -30,6 +33,7 @@ class Product {
       'userid': userid,
       'fileid': fileid,
       'isavailable': isavailable,
+      'quantity': quantity,
     };
   }
 
@@ -48,6 +52,7 @@ class Product {
           : null,
       fileid: map['fileid'],
       isavailable: map['isavailable'] ?? true,
+      quantity: map['quantity'],
     );
   }
 }
