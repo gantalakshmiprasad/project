@@ -183,7 +183,6 @@ class Homepagecontroller extends GetxController {
       printcontroller.bills.add(billEntry);
     }
 
-    printcontroller.total();
     printcontroller.bills.refresh();
   }
 
@@ -214,7 +213,6 @@ class Homepagecontroller extends GetxController {
         }
       }
 
-      printcontroller.total();
       printcontroller.bills.refresh();
     }
   }

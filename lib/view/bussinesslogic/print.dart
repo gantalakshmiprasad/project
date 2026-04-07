@@ -49,6 +49,35 @@ class Printitems extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Bill No : ',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            controller.billno.value.toString(),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Token No : ',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "0",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
                       Defaultext(
                         text: 'Itemname',
                         size: 15,
@@ -114,12 +143,12 @@ class Printitems extends StatelessWidget {
                     children: [
                       Defaultext(text: 'Total', size: 15, color: Colors.black),
                       Defaultext(
-                        text: 'Items(${controller.totalquantity.value})',
+                        text: 'Items(${controller.totalQuantity})',
                         size: 15,
                         color: Colors.black,
                       ),
                       Defaultext(
-                        text: 'Rs.${controller.totalamount.value} ',
+                        text: '${controller.totalAmount}',
                         size: 15,
                         color: Colors.black,
                       ),
@@ -132,7 +161,7 @@ class Printitems extends StatelessWidget {
 
           IconButton(
             onPressed: () {
-              controller.print();
+              controller.printReceipt();
             },
             icon: Icon(Icons.print),
           ),

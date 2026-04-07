@@ -57,7 +57,7 @@ class Homepage extends StatelessWidget {
       return Scaffold(
         appBar: appbar(controller),
         body: Row(
-          children: [ 
+          children: [
             Expanded(
               // Better than fixed width percentages for responsiveness
               flex: 3,

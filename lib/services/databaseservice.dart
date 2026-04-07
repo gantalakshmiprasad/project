@@ -3,20 +3,19 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:firstproject/customs/config.dart';
-import 'package:firstproject/services/authservices.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Databaseservice extends GetxService {
+  late final Client client;
   late final Databases databases;
 
   late final TablesDB table;
+  Databaseservice(this.client);
   @override
   void onInit() {
     super.onInit();
-    final client = Get.find<AuthServices>().client;
     databases = Databases(client);
-
     table = TablesDB(client);
   }
 

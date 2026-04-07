@@ -2,7 +2,6 @@
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-
 import 'package:firstproject/customs/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
@@ -13,17 +12,12 @@ class AuthServices extends GetxService {
   late final Account account;
   late Realtime realtime;
   late final Functions function;
-
+  AuthServices(this.client);
   @override
   void onInit() {
     super.onInit();
     try {
-      client = Client()
-          .setEndpoint(ApiConfig().apiendpoint) // e.g. 'http://localhost/v1'
-          .setProject(ApiConfig().projectid);
-
       account = Account(client);
-
       function = Functions(client);
       realtime = Realtime(client);
     } catch (e) {

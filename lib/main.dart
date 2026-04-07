@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:firstproject/services/storageservice.dart';
@@ -10,20 +11,25 @@ import 'package:firstproject/view/Authentication/verificationpage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'customs/config.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  final client = Client()
+      .setEndpoint(ApiConfig().apiendpoint) // e.g. 'http://localhost/v1'
+      .setProject(ApiConfig().projectid)
+      .setSelfSigned(status: true);
   try {
     await Get.putAsync<AuthServices>(
-      () async => AuthServices(),
+      () async => AuthServices(client),
       permanent: true,
     );
     await Get.putAsync<Databaseservice>(
-      () async => Databaseservice(),
+      () async => Databaseservice(client),
       permanent: true,
     );
     await Get.putAsync<Storageservice>(
-      () async => Storageservice(),
+      () async => Storageservice(client),
       permanent: true,
     );
   } catch (e) {

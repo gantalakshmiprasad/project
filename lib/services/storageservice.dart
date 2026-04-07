@@ -5,17 +5,17 @@ import 'dart:typed_data';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart' as models;
 import 'package:firstproject/customs/config.dart';
-import 'package:firstproject/services/authservices.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class Storageservice extends GetxService {
+  late final Client client;
   late final Storage storage;
   late final TablesDB table;
+  Storageservice(this.client);
   @override
   void onInit() {
     super.onInit();
-    final client = Get.find<AuthServices>().client;
 
     storage = Storage(client);
     table = TablesDB(client);
