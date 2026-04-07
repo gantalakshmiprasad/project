@@ -1,7 +1,3 @@
-// ignore_for_file: file_names
-
-import 'dart:typed_data';
-
 import 'package:firstproject/customs/customwidgets.dart';
 import 'package:firstproject/view/bussinesslogic/print.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
@@ -14,118 +10,122 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(Homepagecontroller());
-    return Scaffold(
-      appBar: appbar(controller),
-      body: Obx(() {
-        return Row(
-          children: [
-            Stack(
-              alignment: Alignment.bottomRight,
+
+    return Obx(() {
+      // 1. Show full-screen loader if signing out
+      if (controller.issignedout.value) {
+        return const Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  height: double.infinity,
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: Color(0xFFECEFF1)),
-                  width: Get.width * 0.75,
-
-                  child: controller.database.isNotEmpty
-                      ? GridView.builder(
-                          itemCount: controller.database.length,
-                          shrinkWrap: true,
-
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 7,
-                                childAspectRatio: 0.7,
-                              ),
-                          itemBuilder: (context, index) {
-                            final data = controller.database[index]['data'];
-                            final rowid = controller.database[index]['id'];
-                            final quantity =
-                                controller.database[index]['data']['quantity'];
-                            final Uint8List image =
-                                controller.database[index]['image'];
-
-                            return ItemCard(
-                              key: ValueKey(rowid),
-                              itemName: data['itemname'],
-                              price: data['itemprice'],
-
-                              available: data['isavailable'],
-                              decrease: () {
-                                controller.decreasequantity(rowid);
-                              },
-                              increase: () {
-                                controller.increasequantity(rowid);
-                              },
-                              quantity: quantity,
-                              imageurl: image,
-                              onedit: () => controller.onedit(
-                                rowid ?? 'No information',
-                                data['isavailable'] as bool,
-                                data['itemname'],
-                              ),
-                            );
-                          },
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            controller.isloading.value
-                                ? Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CircularProgressIndicator(
-                                          color: Colors.green,
-                                        ),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          'Items are loading...',
-                                          style: TextStyle(fontSize: 20),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Center(
-                                    child: Defaultext(
-                                      text: 'No data',
-                                      size: 55,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                          ],
-                        ),
+                CircularProgressIndicator(
+                  color: Colors.red,
+                ), // Distinct color for signing out
+                SizedBox(height: 16),
+                Text(
+                  'Please wait while signing out...',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                controller.addclicked.value
-                    ? Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          height: 370,
-                          width: 500,
-                          padding: const EdgeInsets.all(8.0),
-                          child: itemform(controller),
-                        ),
-                      )
-                    : Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: addbutton(controller),
-                        ),
-                      ),
               ],
             ),
+          ),
+        );
+      }
+
+      // 2. Show full-screen loader during initial database fetch
+      if (controller.isloading.value || controller.database.isEmpty) {
+        return Scaffold(
+          appBar: appbar(controller),
+          body: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(color: Colors.green),
+                SizedBox(height: 16),
+                Text(
+                  'Items are loading...',
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // 3. Main UI when not loading or signing out
+      return Scaffold(
+        appBar: appbar(controller),
+        body: Row(
+          children: [ 
+            Expanded(
+              // Better than fixed width percentages for responsiveness
+              flex: 3,
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: const BoxDecoration(color: Color(0xFFECEFF1)),
+                    child: controller.database.isNotEmpty
+                        ? GridView.builder(
+                            itemCount: controller.database.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 7,
+                                  childAspectRatio: 0.7,
+                                ),
+                            itemBuilder: (context, index) {
+                              final item = controller.database[index];
+                              return ItemCard(
+                                key: ValueKey(item['id']),
+                                itemName: item['data']['itemname'],
+                                price: item['data']['itemprice'],
+                                available: item['data']['isavailable'],
+                                quantity: item['quantity'],
+                                imageurl: item['image'],
+                                decrease: () =>
+                                    controller.decreasequantity(item['id']),
+                                increase: () =>
+                                    controller.increasequantity(item['id']),
+                                onedit: () => controller.onedit(
+                                  item['id'],
+                                  item['data']['isavailable'],
+                                  item['data']['itemname'],
+                                ),
+                              );
+                            },
+                          )
+                        : const Center(
+                            child: Text(
+                              'No data found',
+                              style: TextStyle(fontSize: 24),
+                            ),
+                          ),
+                  ),
+                  // Overlay for Adding Items
+                  if (controller.addclicked.value)
+                    Center(
+                      child: Container(
+                        height: 370,
+                        width: 500,
+                        color: Colors.white,
+                        child: itemform(controller),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            // Sidebar for Print
             Container(
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(color: Colors.white54),
+              padding: const EdgeInsets.all(15),
+              decoration: const BoxDecoration(color: Colors.white54),
               width: Get.width * 0.25,
               child: Printitems(),
             ),
           ],
-        );
-      }),
-    );
+        ),
+      );
+    });
   }
 }

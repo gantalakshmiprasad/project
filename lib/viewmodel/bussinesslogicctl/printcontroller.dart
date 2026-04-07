@@ -8,18 +8,13 @@ class Printcontroller extends GetxController {
   final RxList checkout = [].obs;
   final RxInt billno = 0.obs;
 
-  @override
-  void onInit() async {
-    super.onInit();
-  }
-
   void total() {
     totalamount.value = 0.0;
     totalquantity.value = 0;
 
     for (var item in bills) {
       totalamount.value += (item['amount'] as num).toDouble();
-      totalquantity.value += (item['data']['quantity'] as num).toInt();
+      totalquantity.value += (item['quantity'] as num).toInt();
     }
   }
 
@@ -27,8 +22,10 @@ class Printcontroller extends GetxController {
     final homeController = Get.find<Homepagecontroller>();
     bills.clear();
     billno.value++;
-    homeController.onclosed(homeController.database);
     bills.refresh();
+    homeController.database.map((item) {
+      item['quantity'] = 0;
+    });
     homeController.database.refresh();
     totalamount.value = 0.0;
     totalquantity.value = 0;

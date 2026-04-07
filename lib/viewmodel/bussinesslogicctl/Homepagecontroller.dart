@@ -1,10 +1,8 @@
 // ignore_for_file: avoid_print, file_names
-
 import 'dart:convert';
 import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
 import 'package:firstproject/customs/config.dart';
-import 'package:firstproject/model/billmodel.dart';
 import 'package:firstproject/model/itemModel.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/services/databaseservice.dart';
@@ -17,8 +15,9 @@ class Homepagecontroller extends GetxController {
   final service = Get.find<AuthServices>();
   final RxList database = [].obs;
   final RxList storedimages = [].obs;
+  final RxBool issignedout = false.obs;
   final RxBool addclicked = false.obs;
-  final isloading = false.obs;
+  final RxBool isloading = true.obs;
   final printcontroller = Get.put(Printcontroller());
   final userid = ''.obs;
   final GlobalKey<FormState> formkey = GlobalKey<FormState>();
@@ -38,63 +37,10 @@ class Homepagecontroller extends GetxController {
   void onInit() async {
     super.onInit();
     isloading.value = true;
-    listener();
-    await refreshDatabase();
-    // 2. Subscribe to Realtime Changes
+    update();
+    refreshDatabase();
 
     isloading.value = false;
-    // If you want to bind to your observable list:
-  }
-
-  Future<void> listener() async {
-    try {
-      final realtime = authservice
-          .realtime; // Ensure Realtime is initialized in your service
-
-      realtime
-          .subscribe([
-            'databases.${ApiConfig().databaseId}.collections.${ApiConfig().productmodel}.documents',
-          ])
-          .stream
-          .listen((event) async {
-            final String eventType = event.events.first;
-            final Map<String, dynamic> payload = event.payload;
-            final String docId = payload['\$id'];
-
-            // 1. ADD NEW ITEM
-            if (eventType.contains('.create')) {
-              final newItem = Product.fromMap(payload);
-              // Fetch image only for the new item
-              final image = await storageservice.getfile(newItem.fileid);
-
-              database.add({
-                'id': docId,
-                'data': newItem.toMap(),
-
-                'image': image,
-              });
-            }
-            // 2. UPDATE EXISTING ITEM (e.g., price change or availability)
-            else if (eventType.contains('.update')) {
-              final index = database.indexWhere(
-                (element) => element['id'] == docId,
-              );
-              if (index != -1) {
-                final updatedProduct = Product.fromMap(payload);
-
-                // Update only the data part, keep the existing image and quantity
-                database[index]['data'] = updatedProduct.toMap();
-                database.refresh(); // Tells GetX to redraw this specific item
-              }
-            }
-            // 3. REMOVE ITEM
-            else if (eventType.contains('.delete')) {
-              database.removeWhere((element) => element['id'] == docId);
-            }
-          });
-    } catch (e) {
-      throw Exception(e.toString());
-    }
   }
 
   Future<void> submit(String promptText, String price) async {
@@ -109,6 +55,7 @@ class Homepagecontroller extends GetxController {
       );
       final user = await authservice.getaccount(); //getting userid
       final fileid = await clicked(promptText); //getting fileid from function
+      final image = await storageservice.getfile(fileid);
       final product = Product(
         id: '', // leave empty, Appwrite will generate $id
         itemname: promptText,
@@ -120,6 +67,12 @@ class Homepagecontroller extends GetxController {
       );
 
       await dbservice.createEntry(product.toMap(), ApiConfig().productmodel);
+      database.add({
+        'id': user.$id,
+        'data': product.toMap(),
+        'image': image,
+        'quantity': product.quantity,
+      });
     } catch (e) {
       print('Error in homepagectl: $e');
       Exception(e.toString());
@@ -146,118 +99,123 @@ class Homepagecontroller extends GetxController {
     throw Exception();
   }
 
-  Future<void> onedit(String rowid, bool isavailable, String itemname) async {
+  Future<void> onedit(String id, bool isavailable, String itemname) async {
     try {
-      isloading.value = true;
       Get.defaultDialog(
+        contentPadding: EdgeInsets.all(15),
         title: isavailable ? 'Sold out' : 'Available',
         content: isavailable
-            ? Text('$itemname is Sold out')
-            : Text('$itemname is available now'),
-        titleStyle: TextStyle(color: Colors.black),
+            ? Stack(
+                children: [
+                  Text(
+                    '${itemname.toUpperCase()} is Sold out',
+                    style: TextStyle(fontSize: 30),
+                  ),
+                ],
+              )
+            : Text(
+                '${itemname.toUpperCase()} is available now',
+                style: TextStyle(fontSize: 30),
+              ),
+        titleStyle: TextStyle(color: Colors.black, fontSize: 30),
         backgroundColor: isavailable ? Colors.red : Colors.green,
+        onCancel: Get.back,
+        cancelTextColor: Colors.black,
       );
-      final item = await dbservice.getEntries(rowid);
-      await dbservice.updateEntry(rowid, {
-        ...item,
-        "isavailable": !isavailable,
-      }, ApiConfig().productmodel);
-      final index = database.indexWhere((item) => item['id'] == rowid);
-      if (index != -1) {
-        database[index]['data']['isavailable'] = !isavailable;
-        database.refresh();
+      for (var item in database) {
+        if (item['id'] == id) {
+          item['data']['isavailable'] = !isavailable;
+          database.refresh();
+        }
       }
     } catch (e) {
       throw Exception(e.toString());
-    } finally {
-      isloading.value = false;
-      Get.back();
     }
   }
 
   Future<void> onclosed(RxList database) async {
     try {
-      database.where((item) => item['data']['isavailable'] == false).map((
-        item,
-      ) async {
-        final result = await dbservice.updateEntry(item['id'], {
+      issignedout.value = true;
+      for (var item in database) {
+        await dbservice.updateEntry(item['id'], {
           'isavailable': true,
           'quantity': 0,
         }, ApiConfig().productmodel);
-      });
-
-      database.refresh();
+      }
+      issignedout.value = false;
+      Get.offAllNamed('/');
     } catch (e) {
       throw Exception(e.toString());
     }
   }
 
-  void increasequantity(String id) async {
-    for (var item in database) {
-      if (item['id'] == id) {
-        final newquantity = item['data']['quantity'];
-        await dbservice.updateEntry(item['id'], {
-          'quantity': newquantity + 1,
-        }, ApiConfig().productmodel);
-        database.refresh();
+  void increasequantity(String id) {
+    final index = database.indexWhere((item) => item['id'] == id);
+    if (index == -1) return;
 
-        var existingBillIndex = printcontroller.bills.indexWhere(
-          (bill) => bill['id'] == id,
-        );
+    // 1. Update Local Database List
+    database[index]['quantity']++;
+    database[index]['data']['quantity'] = database[index]['quantity'];
+    database.refresh();
 
-        if (existingBillIndex != -1) {
-          printcontroller.bills[existingBillIndex]['quantity']++;
-          double price = printcontroller.bills[existingBillIndex]['itemprice'];
-          int newQty = printcontroller.bills[existingBillIndex]['quantity'];
-          printcontroller.bills[existingBillIndex]['amount'] = price * newQty;
-        } else {
-          final updateditem = await dbservice.updateEntry(item['id'], {
-            'quantity': 1,
-          }, ApiConfig().productmodel);
+    // 2. Update Print Controller
+    var existingBillIndex = printcontroller.bills.indexWhere(
+      (bill) => bill['id'] == id,
+    );
 
-          final purchaseditem = Billmodel.fromMap(updateditem.data);
-          print(purchaseditem.toMap());
-          printcontroller.bills.add(purchaseditem.toMap());
-        }
-        database.refresh();
-        printcontroller.total();
-        printcontroller.bills.refresh();
-      }
+    if (existingBillIndex != -1) {
+      printcontroller.bills[existingBillIndex]['quantity']++;
+      double price = double.parse(
+        printcontroller.bills[existingBillIndex]['itemprice'].toString(),
+      );
+      printcontroller.bills[existingBillIndex]['amount'] =
+          price * printcontroller.bills[existingBillIndex]['quantity'];
+    } else {
+      // Create new bill entry from product
+      final product = database[index];
+      final billEntry = {
+        'id': product['id'],
+        'itemname': product['data']['itemname'],
+        'itemprice': product['data']['itemprice'],
+        'quantity': 1,
+        'amount': double.parse(product['data']['itemprice'].toString()),
+      };
+      printcontroller.bills.add(billEntry);
     }
+
+    printcontroller.total();
+    printcontroller.bills.refresh();
   }
 
-  void decreasequantity(String id) async {
-    for (var item in database) {
-      if (item['id'] == id) {
-        item['data']['quantity']--;
+  void decreasequantity(String id) {
+    final index = database.indexWhere((item) => item['id'] == id);
+    if (index == -1) return;
 
-        // 2. Sync with the printcontroller.bills list
-        // Find if the item already exists in the bills list
-        var existingBillIndex = printcontroller.bills.indexWhere(
-          (bill) => bill['id'] == id,
-        );
+    if (database[index]['quantity'] > 0) {
+      // 1. Update Local Database List
+      database[index]['quantity']--;
+      database[index]['data']['quantity'] = database[index]['quantity'];
+      database.refresh();
 
-        if (existingBillIndex != -1) {
-          // If it exists, increment the quantity of the existing bill object
-          printcontroller.bills[existingBillIndex]['data']['quantity']--;
-          double price =
-              printcontroller.bills[existingBillIndex]['data']['itemprice'];
-          int newQty =
-              printcontroller.bills[existingBillIndex]['data']['quantity'];
-          printcontroller.bills[existingBillIndex]['amount'] = price * newQty;
+      // 2. Update Print Controller
+      var existingBillIndex = printcontroller.bills.indexWhere(
+        (bill) => bill['id'] == id,
+      );
+      if (existingBillIndex != -1) {
+        if (printcontroller.bills[existingBillIndex]['quantity'] > 1) {
+          printcontroller.bills[existingBillIndex]['quantity']--;
+          double price = double.parse(
+            printcontroller.bills[existingBillIndex]['itemprice'].toString(),
+          );
+          printcontroller.bills[existingBillIndex]['amount'] =
+              price * printcontroller.bills[existingBillIndex]['quantity'];
         } else {
-          // If it doesn't exist, create it from the updated item and add it
-          final purchaseditem = Billmodel.fromMap(item);
-          printcontroller.bills.add(purchaseditem.toMap());
+          printcontroller.bills.removeAt(existingBillIndex);
         }
-
-        // 3. Notify the UI
-        database.refresh();
-        printcontroller.bills
-            .refresh(); // Assuming bills is also an RxList/Observable
-
-        break; // Optimization: stop looking once the item is found
       }
+
+      printcontroller.total();
+      printcontroller.bills.refresh();
     }
   }
 
@@ -274,7 +232,12 @@ class Homepagecontroller extends GetxController {
         final item = Product.fromMap(row.data);
 
         final image = await storageservice.getfile(item.fileid);
-        freshdata.add({'id': row.$id, 'data': item.toMap(), 'image': image});
+        freshdata.add({
+          'id': row.$id,
+          'data': item.toMap(),
+          'image': image,
+          'quantity': item.quantity,
+        });
       }
       database.clear();
       database.assignAll(freshdata);
@@ -289,7 +252,6 @@ class Homepagecontroller extends GetxController {
   void onClose() {
     namecontroller.dispose();
     pricecontroller.dispose();
-
     super.onClose();
   }
 }

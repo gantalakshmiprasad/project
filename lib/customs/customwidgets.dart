@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -249,22 +248,15 @@ class Defaultext extends StatelessWidget {
 
 ////////////////////////////////////////////////////
 
-Padding addbutton(Homepagecontroller controller) {
+Widget addbutton(Homepagecontroller controller) {
   return Padding(
-    padding: const EdgeInsets.all(25),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        SizedBox(width: 15),
-        FloatingActionButton(
-          backgroundColor: Colors.amber,
-          onPressed: () {
-            controller.opendialog();
-          },
-          child: Icon(Icons.add),
-        ),
-        SizedBox(height: 2),
-      ],
+    padding: const EdgeInsets.all(10),
+    child: FloatingActionButton(
+      backgroundColor: Colors.amber,
+      onPressed: () {
+        controller.opendialog();
+      },
+      child: Icon(Icons.add),
     ),
   );
 }
@@ -316,11 +308,16 @@ AppBar appbar(Homepagecontroller controller) {
     ),
     actions: [
       IconButton(
-        onPressed: () async {
-          controller.isloading.value = true;
-          await controller.onclosed(controller.database);
+        tooltip: 'Add Items',
 
-          Get.offAllNamed('/');
+        onPressed: () {
+          controller.opendialog();
+        },
+        icon: Icon(Icons.add, color: Colors.white),
+      ),
+      IconButton(
+        onPressed: () {
+          controller.onclosed(controller.database);
         },
         icon: Icon(Icons.logout, color: Colors.white),
       ),
