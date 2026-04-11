@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, file_names
 import 'dart:convert';
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
 import 'package:firstproject/customs/config.dart';
@@ -39,7 +40,6 @@ class Homepagecontroller extends GetxController {
     isloading.value = true;
     update();
     refreshDatabase();
-
     isloading.value = false;
   }
 
@@ -73,6 +73,19 @@ class Homepagecontroller extends GetxController {
         'image': image,
         'quantity': product.quantity,
       });
+    } on AppwriteException catch (e) {
+      // 409 is the specific code for a Unique Index violation
+      if (e.code == 409) {
+        Get.snackbar(
+          "Duplicate Item",
+          "An item with the name '$promptText' already exists.",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar("Error", e.message ?? "An unknown error occurred");
+      }
     } catch (e) {
       print('Error in homepagectl: $e');
       Exception(e.toString());
@@ -223,6 +236,11 @@ class Homepagecontroller extends GetxController {
       final RowList rowlist = await dbservice.fetchdata(
         user.$id,
         ApiConfig().productmodel,
+        [
+          Query.equal('userid', [user.$id]),
+          Query.limit(100),
+          Query.orderAsc('itemname'),
+        ],
       );
 
       final freshdata = [];

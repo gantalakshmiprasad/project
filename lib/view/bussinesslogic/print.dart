@@ -23,6 +23,25 @@ class Printitems extends StatelessWidget {
               border: Border.all(color: Colors.black, width: 0.5),
             ),
             child: Obx(() {
+              if (controller.isloading.value) {
+                return Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 6),
+                        Defaultext(
+                          text: 'Printing..',
+                          size: 20,
+                          color: Colors.green,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
               final presenttime = TimeOfDay.now().format(context);
               final now = DateTime.now();
               return Column(
@@ -52,11 +71,11 @@ class Printitems extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'Bill No : ',
+                            'Token No : ',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            controller.billno.value.toString(),
+                            controller.token.value.toString(),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -64,11 +83,11 @@ class Printitems extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'Token No : ',
+                            'Bill No : ',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "0",
+                            controller.billno.value.toString(),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],

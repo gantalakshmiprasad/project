@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,10 +16,11 @@ Widget buildTextField({
     controller: controller,
     validator: (value) {
       if (value == null || value.isEmpty) {
-        return 'Please enter the $hint';
+        return '! Please enter the $hint';
       }
       return null;
     },
+
     obscureText: isPassword,
     style: const TextStyle(color: Colors.black),
     decoration: InputDecoration(
@@ -48,6 +50,7 @@ class ItemCard extends StatelessWidget {
   final bool available;
   final Uint8List imageurl;
   final Callback onedit;
+  final Callback ondelete;
   const ItemCard({
     super.key,
     // required this.imageUrl,
@@ -60,6 +63,7 @@ class ItemCard extends StatelessWidget {
     required this.quantity,
     required this.imageurl,
     required this.onedit,
+    required this.ondelete,
   });
 
   @override
@@ -180,39 +184,42 @@ class Itemdialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Form(
-        key: formkey,
-        child: Container(
-          height: 350,
-          width: 600,
-          padding: EdgeInsets.all(25),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(162, 128, 239, 222),
-            borderRadius: BorderRadius.circular(25),
-            boxShadow: [
-              BoxShadow(
-                color: const Color.fromARGB(119, 63, 63, 63),
-                spreadRadius: 600,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Defaultext(text: 'Add item', size: 25, color: Colors.black),
-              SizedBox(height: 15),
-              buildTextField(hint: 'Item name', controller: namecontroller),
-              SizedBox(height: 15),
-              buildTextField(hint: 'Price', controller: pricecontroller),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: submit,
-                child: Defaultext(
-                  text: 'Submit',
-                  size: 20,
-                  color: Colors.green,
+      body: SizedBox(
+        height: double.infinity,
+        width: 600,
+        child: Form(
+          key: formkey,
+          child: Container(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(141, 108, 251, 72),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black,
+                  spreadRadius: 0.5,
+                  blurRadius: 1.5,
                 ),
-              ),
-            ],
+              ],
+            ),
+            child: Column(
+              children: [
+                Defaultext(text: 'Add item', size: 25, color: Colors.black),
+                SizedBox(height: 15),
+                buildTextField(hint: 'Item name', controller: namecontroller),
+                SizedBox(height: 15),
+                buildTextField(hint: 'Price', controller: pricecontroller),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: submit,
+                  child: Defaultext(
+                    text: 'Submit',
+                    size: 20,
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -284,7 +291,7 @@ Stack itemform(Homepagecontroller controller) {
 
       IconButton(
         padding: EdgeInsets.all(25),
-        focusColor: Colors.transparent,
+        color: Colors.white,
         onPressed: () {
           controller.closedialog();
         },
@@ -306,7 +313,16 @@ AppBar appbar(Homepagecontroller controller) {
         fontSize: 35,
       ),
     ),
+    actionsPadding: EdgeInsets.only(right: 30),
     actions: [
+      IconButton(
+        tooltip: 'Bills',
+
+        onPressed: () {
+          Get.toNamed('/billshistory');
+        },
+        icon: Icon(Icons.history, color: Colors.white),
+      ),
       IconButton(
         tooltip: 'Add Items',
 
@@ -316,6 +332,7 @@ AppBar appbar(Homepagecontroller controller) {
         icon: Icon(Icons.add, color: Colors.white),
       ),
       IconButton(
+        tooltip: 'Sign Out',
         onPressed: () {
           controller.onclosed(controller.database);
         },

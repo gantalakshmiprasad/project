@@ -8,6 +8,7 @@ import 'package:firstproject/view/Authentication/resetpassword.dart';
 import 'package:firstproject/view/Authentication/signin.dart';
 import 'package:firstproject/view/Authentication/signup.dart';
 import 'package:firstproject/view/Authentication/verificationpage.dart';
+import 'package:firstproject/view/bussinesslogic/bills.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,6 +19,7 @@ void main() async {
   final client = Client()
       .setEndpoint(ApiConfig().apiendpoint) // e.g. 'http://localhost/v1'
       .setProject(ApiConfig().projectid)
+      .setDevKey(ApiConfig().devkey)
       .setSelfSigned(status: true);
   try {
     await Get.putAsync<AuthServices>(
@@ -57,6 +59,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/verificationpage', page: () => Verificationpage()),
         GetPage(name: '/forgotpassword', page: () => Forgotpassword()),
         GetPage(name: '/Resetpassword', page: () => Resetpassword()),
+        GetPage(name: '/billshistory', page: () => Billshistory()),
       ],
     );
   }

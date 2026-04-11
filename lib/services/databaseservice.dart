@@ -32,8 +32,8 @@ class Databaseservice extends GetxService {
       );
 
       return document.data;
-    } on AppwriteException catch (e) {
-      throw Exception(e.message);
+    } catch (e) {
+      throw e.toString();
     }
   }
 
@@ -103,16 +103,16 @@ class Databaseservice extends GetxService {
     }
   }
 
-  Future<RowList> fetchdata(String userId, String tableid) async {
+  Future<RowList> fetchdata(
+    String userId,
+    String tableid,
+    List<String> queries,
+  ) async {
     try {
       final data = await table.listRows(
         databaseId: ApiConfig().databaseId,
         tableId: tableid,
-        queries: [
-          Query.equal('userid', [userId]),
-          Query.limit(100),
-          Query.orderDesc('\$createdAt'),
-        ],
+        queries: queries,
       );
       return data;
     } catch (e) {

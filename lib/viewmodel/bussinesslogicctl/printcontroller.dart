@@ -1,10 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'package:appwrite/appwrite.dart';
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
+
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
-import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 
 class Printcontroller extends GetxController {
@@ -12,7 +14,8 @@ class Printcontroller extends GetxController {
   final RxList checkoutHistory = [].obs;
   final RxInt billno = 0.obs;
   final Databaseservice database = Get.find<Databaseservice>();
-
+  final RxBool isloading = false.obs;
+  final RxInt token = 1.obs;
   double get totalAmount => bills.fold(
     0.0,
     (sum, item) =>
@@ -24,16 +27,35 @@ class Printcontroller extends GetxController {
   int get totalQuantity =>
       bills.fold(0, (sum, item) => sum + (item['quantity'] as int));
 
+  @override
+  void onInit() async {
+    super.onInit();
+    try {
+      final user = await Get.find<AuthServices>().getaccount();
+      final result = await database.fetchdata(user.$id, ApiConfig().bill, [
+        // Filter by user
+        Query.orderDesc('billnumber'), // Sort highest to lowest
+        Query.limit(1), // Only take the top one
+      ]);
+      if (result.rows.isNotEmpty) {
+        // Get the highest number and add 1
+        int lastBill = result.rows.first.data['billnumber'];
+        billno.value = lastBill + 1;
+      } else {
+        billno.value = 1; // Start at 1 if no bills exist
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> printReceipt() async {
     final homepagectl = Get.find<Homepagecontroller>();
 
     if (bills.isEmpty) return;
 
     try {
-      CircularProgressIndicator();
-      final user = await Get.find<AuthServices>().account.get();
-      print("User is logged in as: ${user.email}");
-      // 1. Capture the current state before clearing
+      isloading.value = true;
       final currentBillNo = billno.value;
       final currentTotal = int.tryParse(totalAmount.toString());
       final itemsToSave = List.from(bills);
@@ -44,22 +66,22 @@ class Printcontroller extends GetxController {
         "total": currentTotal,
       };
 
+      final data1 = {'billnumber': currentBillNo, 'totalamount': currentTotal};
+
       // 2. Database: Create the main bill entry
       // Use .value for RxInt, otherwise you pass the controller object, not the number
-      await database.createEntry({
-        'billnumber': currentBillNo,
-        'totalamount': currentTotal,
-      }, ApiConfig().bill);
+      await database.createEntry(data1, ApiConfig().bill);
 
       // 3. Database: Save individual items
       // FIX: Loop through 'itemsToSave', because 'bills' gets cleared below!
       for (var item in itemsToSave) {
-        await database.createEntry({
+        final data = {
           'billnumber': currentBillNo,
           'itemname': item['itemname'],
-          'itemprice': int.tryParse(item['itemprice']),
-          'quantity': int.tryParse(item['quantity']),
-        }, ApiConfig().billeditems);
+          'itemprice': int.tryParse(item['itemprice'].toString()),
+          'quantity': int.tryParse(item['quantity'].toString()),
+        };
+        await database.createEntry(data, ApiConfig().billeditems);
       }
 
       // 4. UI/Local State Cleanup
@@ -75,7 +97,8 @@ class Printcontroller extends GetxController {
       homepagectl.isloading.value = false;
       homepagectl.database.refresh();
 
-      Get.back();
+      isloading.value = false;
+      token.value++;
     } catch (e) {
       print("Error saving receipt: $e");
       // Consider using Get.snackbar here to inform the user

@@ -12,63 +12,39 @@ class Homepage extends StatelessWidget {
     final controller = Get.put(Homepagecontroller());
 
     return Obx(() {
-      // 1. Show full-screen loader if signing out
+      // 1. Full-screen loader for Sign Out
       if (controller.issignedout.value) {
-        return const Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(
-                  color: Colors.red,
-                ), // Distinct color for signing out
-                SizedBox(height: 16),
-                Text(
-                  'Please wait while signing out...',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        );
+        return _loadingScreen('Please wait while signing out...', Colors.red);
       }
 
-      // 2. Show full-screen loader during initial database fetch
-      if (controller.isloading.value || controller.database.isEmpty) {
-        return Scaffold(
-          appBar: appbar(controller),
-          body: const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(color: Colors.green),
-                SizedBox(height: 16),
-                Text(
-                  'Items are loading...',
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                ),
-              ],
-            ),
-          ),
-        );
+      // 2. Full-screen loader for Initial Fetch
+      if (controller.isloading.value && controller.database.isEmpty) {
+        return _loadingScreen('Items are loading...', Colors.green);
       }
 
-      // 3. Main UI when not loading or signing out
+      // 3. Main UI Structure (Always returns this unless loading)
       return Scaffold(
         appBar: appbar(controller),
         body: Row(
           children: [
             Expanded(
-              // Better than fixed width percentages for responsiveness
               flex: 3,
               child: Stack(
-                alignment: Alignment.bottomRight,
+                alignment: Alignment.center, // Center the form overlay
                 children: [
                   Container(
                     padding: const EdgeInsets.all(5),
                     decoration: const BoxDecoration(color: Color(0xFFECEFF1)),
-                    child: controller.database.isNotEmpty
-                        ? GridView.builder(
+                    // Check if database is empty HERE instead of top-level
+                    child: controller.database.isEmpty
+                        ? const Center(
+                            child: Defaultext(
+                              text: 'No items yet',
+                              size: 55,
+                              color: Colors.orange,
+                            ),
+                          )
+                        : GridView.builder(
                             itemCount: controller.database.length,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -93,30 +69,24 @@ class Homepage extends StatelessWidget {
                                   item['data']['isavailable'],
                                   item['data']['itemname'],
                                 ),
+                                ondelete: () {},
                               );
                             },
-                          )
-                        : const Center(
-                            child: Text(
-                              'No data found',
-                              style: TextStyle(fontSize: 24),
-                            ),
                           ),
                   ),
-                  // Overlay for Adding Items
+
+                  // 4. Overlay for Adding Items (Works even if list is empty)
                   if (controller.addclicked.value)
-                    Center(
-                      child: Container(
-                        height: 370,
-                        width: 500,
-                        color: Colors.white,
-                        child: itemform(controller),
-                      ),
+                    SizedBox(
+                      height: 370,
+                      width: 500,
+
+                      child: itemform(controller),
                     ),
                 ],
               ),
             ),
-            // Sidebar for Print
+            // Sidebar
             Container(
               padding: const EdgeInsets.all(15),
               decoration: const BoxDecoration(color: Colors.white54),
@@ -127,5 +97,24 @@ class Homepage extends StatelessWidget {
         ),
       );
     });
+  }
+
+  // Helper widget for full-screen loading
+  Widget _loadingScreen(String message, Color color) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: color),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
