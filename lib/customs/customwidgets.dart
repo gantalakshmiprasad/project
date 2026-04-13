@@ -74,6 +74,8 @@ class ItemCard extends StatelessWidget {
       alignment: Alignment.topRight,
       children: [
         Card(
+          borderOnForeground: false,
+
           elevation: 15,
           color: quantity > 0 ? Colors.orange : Colors.white,
           shape: RoundedRectangleBorder(
@@ -156,11 +158,21 @@ class ItemCard extends StatelessWidget {
             ),
           ),
         ),
-        IconButton(
-          onPressed: onedit,
-          icon: available
-              ? Icon(Icons.toggle_on, color: Colors.green)
-              : Icon(Icons.toggle_off, color: Colors.red),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              onPressed: onedit,
+              icon: available
+                  ? Icon(Icons.toggle_on, color: Colors.green)
+                  : Icon(Icons.toggle_off, color: Colors.red),
+            ),
+            IconButton(
+              tooltip: 'delete',
+              onPressed: ondelete,
+              icon: Icon(Icons.delete, color: Colors.red),
+            ),
+          ],
         ),
       ],
     );
@@ -278,9 +290,16 @@ Stack itemform(Homepagecontroller controller) {
         pricecontroller: controller.pricecontroller,
         submit: () {
           if (controller.formkey.currentState!.validate()) {
-            controller.submit(
-              controller.namecontroller.text.trim(),
-              controller.pricecontroller.text.trim(),
+            Get.showOverlay(
+              asyncFunction: () => controller.submit(
+                controller.namecontroller.text,
+                controller.pricecontroller.text,
+              ),
+              loadingWidget: const Center(
+                child: CircularProgressIndicator(color: Colors.green),
+              ),
+              opacity: 0.5,
+              opacityColor: Colors.black,
             );
           }
 

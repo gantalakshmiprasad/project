@@ -47,12 +47,7 @@ class Homepagecontroller extends GetxController {
     try {
       closedialog();
       isloading.value = true;
-      Get.defaultDialog(
-        content: CircularProgressIndicator(color: Colors.green),
-        title: 'Adding $promptText',
-        titleStyle: TextStyle(color: Colors.white),
-        backgroundColor: Color(0xFF263238),
-      );
+
       final user = await authservice.getaccount(); //getting userid
       final fileid = await clicked(promptText); //getting fileid from function
       final image = await storageservice.getfile(fileid);
@@ -79,19 +74,16 @@ class Homepagecontroller extends GetxController {
         Get.snackbar(
           "Duplicate Item",
           "An item with the name '$promptText' already exists.",
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.red,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
         );
       } else {
         Get.snackbar("Error", e.message ?? "An unknown error occurred");
       }
     } catch (e) {
-      print('Error in homepagectl: $e');
-      Exception(e.toString());
+      throw e.toString();
     } finally {
       isloading.value = false;
-      Get.back();
     }
   }
 

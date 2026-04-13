@@ -32,8 +32,11 @@ class Databaseservice extends GetxService {
       );
 
       return document.data;
+    } on AppwriteException catch (e) {
+      // Re-throw as AppwriteException so the controller can catch the 409 code
+      rethrow;
     } catch (e) {
-      throw e.toString();
+      throw Exception(e.toString());
     }
   }
 
