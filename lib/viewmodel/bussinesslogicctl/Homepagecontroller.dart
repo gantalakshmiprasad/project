@@ -18,7 +18,7 @@ class Homepagecontroller extends GetxController {
   final RxList storedimages = [].obs;
   final RxBool issignedout = false.obs;
   final RxBool addclicked = false.obs;
-  final RxBool isloading = true.obs;
+  final RxBool isitemsloading = false.obs;
   final printcontroller = Get.put(Printcontroller());
   final userid = ''.obs;
   final GlobalKey<FormState> formkey = GlobalKey<FormState>();
@@ -37,16 +37,16 @@ class Homepagecontroller extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    isloading.value = true;
+    isitemsloading.value = true;
     update();
     refreshDatabase();
-    isloading.value = false;
+    isitemsloading.value = false;
   }
 
   Future<void> submit(String promptText, String price) async {
     try {
       closedialog();
-      isloading.value = true;
+      isitemsloading.value = true;
 
       final user = await authservice.getaccount(); //getting userid
       final fileid = await clicked(promptText); //getting fileid from function
@@ -83,7 +83,7 @@ class Homepagecontroller extends GetxController {
     } catch (e) {
       throw e.toString();
     } finally {
-      isloading.value = false;
+      isitemsloading.value = false;
     }
   }
 
@@ -184,6 +184,7 @@ class Homepagecontroller extends GetxController {
         'itemprice': product['data']['itemprice'],
         'quantity': 1,
         'amount': double.parse(product['data']['itemprice'].toString()),
+        'restaurantid': product['data']['restaurantid'],
       };
       printcontroller.bills.add(billEntry);
     }
@@ -225,15 +226,12 @@ class Homepagecontroller extends GetxController {
   Future<void> refreshDatabase() async {
     try {
       final user = await authservice.getaccount();
-      final RowList rowlist = await dbservice.fetchdata(
-        user.$id,
-        ApiConfig().productmodel,
-        [
-          Query.equal('userid', [user.$id]),
-          Query.limit(100),
-          Query.orderAsc('itemname'),
-        ],
-      );
+      final RowList rowlist = await dbservice
+          .fetchdata(user.$id, ApiConfig().productmodel, [
+            Query.equal('restaurantid', user.$id),
+            Query.limit(100),
+            Query.orderAsc('itemname'),
+          ]);
 
       final freshdata = [];
       for (var row in rowlist.rows) {
@@ -253,6 +251,22 @@ class Homepagecontroller extends GetxController {
       print("Error refreshing database: $e");
     } finally {
       database.refresh();
+    }
+  }
+
+  Future<void> ondelete(String rowid, String itemname) async {
+    try {
+      await dbservice.deleteEntry(rowid, ApiConfig().productmodel);
+
+      Get.snackbar(
+        'Delete',
+        "$itemname is deleted",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+      refreshDatabase();
+    } catch (e) {
+      throw e.toString();
     }
   }
 

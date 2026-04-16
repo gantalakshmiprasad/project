@@ -18,9 +18,6 @@ class Homepage extends StatelessWidget {
       }
 
       // 2. Full-screen loader for Initial Fetch
-      if (controller.isloading.value && controller.database.isEmpty) {
-        return _loadingScreen('Items are loading...', Colors.green);
-      }
 
       // 3. Main UI Structure (Always returns this unless loading)
       return Scaffold(
@@ -36,14 +33,8 @@ class Homepage extends StatelessWidget {
                     padding: const EdgeInsets.all(5),
                     decoration: const BoxDecoration(color: Color(0xFFECEFF1)),
                     // Check if database is empty HERE instead of top-level
-                    child: controller.database.isEmpty
-                        ? const Center(
-                            child: Defaultext(
-                              text: 'No items yet',
-                              size: 55,
-                              color: Colors.orange,
-                            ),
-                          )
+                    child: controller.isitemsloading.value
+                        ? Center(child: CircularProgressIndicator())
                         : GridView.builder(
                             itemCount: controller.database.length,
                             gridDelegate:
@@ -69,7 +60,28 @@ class Homepage extends StatelessWidget {
                                   item['data']['isavailable'],
                                   item['data']['itemname'],
                                 ),
-                                ondelete: () {},
+                                ondelete: () {
+                                  Get.defaultDialog(
+                                    title: 'Warning',
+                                    content: Text(
+                                      'Do you want to delete ${item['data']['itemname']}? ',
+                                    ),
+                                    confirm: ElevatedButton(
+                                      onPressed: () {
+                                        controller.ondelete(
+                                          item['id'],
+                                          item['data']['itemname'],
+                                        );
+                                        Get.back();
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                    cancel: ElevatedButton(
+                                      onPressed: () => Get.back(),
+                                      child: Text('No'),
+                                    ),
+                                  );
+                                },
                               );
                             },
                           ),

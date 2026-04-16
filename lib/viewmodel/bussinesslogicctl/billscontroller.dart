@@ -13,6 +13,7 @@ class Billscontroller extends GetxController {
   void onInit() {
     super.onInit();
     fetchBills();
+    bills.map((element) => print(element));
   }
 
   Future<void> fetchBills() async {
@@ -46,6 +47,7 @@ class Billscontroller extends GetxController {
               'itemname': itemRow.data['itemname'], // USE itemRow here
               'itemprice': itemRow.data['itemprice'],
               'quantity': itemRow.data['quantity'],
+              'restaurantid': itemRow.data['restaurantid'],
             });
           }
         }
@@ -54,12 +56,14 @@ class Billscontroller extends GetxController {
           'billnumber': billRow.data['billnumber'],
           'totalamount': billRow.data['totalamount'],
           'items': billItems,
+          'restaurantid': billRow.data['restaurantid'],
+          'createdAt': billRow.$createdAt,
         });
       }
 
       bills.assignAll(temporaryList);
     } catch (e) {
-      print("Error fetching history: $e");
+      throw e.toString();
     } finally {
       isLoading.value = false;
     }

@@ -34,7 +34,9 @@ class Printcontroller extends GetxController {
       final user = await Get.find<AuthServices>().getaccount();
       final result = await database.fetchdata(user.$id, ApiConfig().bill, [
         // Filter by user
-        Query.orderDesc('billnumber'), // Sort highest to lowest
+        Query.equal('restaurantid', user.$id),
+        Query.orderDesc('billnumber'),
+        // Sort highest to lowest
         Query.limit(1), // Only take the top one
       ]);
       if (result.rows.isNotEmpty) {
@@ -65,9 +67,14 @@ class Printcontroller extends GetxController {
         "items": itemsToSave,
         "total": currentTotal,
       };
-
-      final data1 = {'billnumber': currentBillNo, 'totalamount': currentTotal};
-
+      print(receipt);
+      final user = await Get.find<AuthServices>().getaccount();
+      final data1 = {
+        'billnumber': currentBillNo,
+        'totalamount': currentTotal,
+        'restaurantid': user.$id,
+      };
+      print(data1);
       // 2. Database: Create the main bill entry
       // Use .value for RxInt, otherwise you pass the controller object, not the number
       await database.createEntry(data1, ApiConfig().bill);
@@ -80,21 +87,27 @@ class Printcontroller extends GetxController {
           'itemname': item['itemname'],
           'itemprice': int.tryParse(item['itemprice'].toString()),
           'quantity': int.tryParse(item['quantity'].toString()),
+          'restaurantid': user.$id,
         };
+        print(data);
         await database.createEntry(data, ApiConfig().billeditems);
       }
 
       // 4. UI/Local State Cleanup
       checkoutHistory.add(receipt);
       bills.clear();
-      billno.value++; // Increment for the next customer
+      billno.value++;
+
+      // Increment for the next customer
 
       // Reset quantities in the home controller
-      homepagectl.isloading.value = true;
+
+      homepagectl.isitemsloading.value = true;
+
       for (var item in homepagectl.database) {
         item['quantity'] = 0;
       }
-      homepagectl.isloading.value = false;
+      homepagectl.isitemsloading.value = false;
       homepagectl.database.refresh();
 
       isloading.value = false;

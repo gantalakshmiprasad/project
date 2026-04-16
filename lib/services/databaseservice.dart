@@ -32,7 +32,7 @@ class Databaseservice extends GetxService {
       );
 
       return document.data;
-    } on AppwriteException catch (e) {
+    } on AppwriteException {
       // Re-throw as AppwriteException so the controller can catch the 409 code
       rethrow;
     } catch (e) {
@@ -87,11 +87,11 @@ class Databaseservice extends GetxService {
   }
 
   /// 4. DELETE - Remove a document
-  Future<bool> deleteEntry(String rowId) async {
+  Future<bool> deleteEntry(String rowId, String tableId) async {
     try {
       await table.deleteRow(
         databaseId: ApiConfig().databaseId,
-        tableId: ApiConfig().collectionId,
+        tableId: tableId,
         rowId: rowId,
       );
       return true;

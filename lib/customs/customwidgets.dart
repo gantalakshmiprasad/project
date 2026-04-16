@@ -216,12 +216,12 @@ class Itemdialog extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Defaultext(text: 'Add item', size: 25, color: Colors.black),
+                Defaultext(text: 'Add item', size: 25, color: Colors.white),
                 SizedBox(height: 15),
                 buildTextField(hint: 'Item name', controller: namecontroller),
                 SizedBox(height: 15),
                 buildTextField(hint: 'Price', controller: pricecontroller),
-                SizedBox(height: 10),
+                SizedBox(height: 35),
                 ElevatedButton(
                   onPressed: submit,
                   child: Defaultext(
@@ -290,16 +290,9 @@ Stack itemform(Homepagecontroller controller) {
         pricecontroller: controller.pricecontroller,
         submit: () {
           if (controller.formkey.currentState!.validate()) {
-            Get.showOverlay(
-              asyncFunction: () => controller.submit(
-                controller.namecontroller.text,
-                controller.pricecontroller.text,
-              ),
-              loadingWidget: const Center(
-                child: CircularProgressIndicator(color: Colors.green),
-              ),
-              opacity: 0.5,
-              opacityColor: Colors.black,
+            controller.submit(
+              controller.namecontroller.text,
+              controller.pricecontroller.text,
             );
           }
 
