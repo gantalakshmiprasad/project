@@ -16,7 +16,32 @@ class Homepage extends StatelessWidget {
       if (controller.issignedout.value) {
         return _loadingScreen('Please wait while signing out...', Colors.red);
       }
-
+      if (controller.isitemsloading.value) {
+        return Scaffold(
+          appBar: appbar(controller),
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: Colors.green),
+                SizedBox(height: 10),
+                Text("Fetching items..."),
+              ],
+            ),
+          ),
+        );
+      }
+      if (controller.database.isEmpty) {
+        return Scaffold(
+          appBar: appbar(controller),
+          body: Center(
+            child: Text(
+              controller.message.value,
+              style: const TextStyle(fontSize: 24, color: Colors.grey),
+            ),
+          ),
+        );
+      }
       // 2. Full-screen loader for Initial Fetch
 
       // 3. Main UI Structure (Always returns this unless loading)
@@ -32,59 +57,58 @@ class Homepage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(5),
                     decoration: const BoxDecoration(color: Color(0xFFECEFF1)),
+
                     // Check if database is empty HERE instead of top-level
-                    child: controller.isitemsloading.value
-                        ? Center(child: CircularProgressIndicator())
-                        : GridView.builder(
-                            itemCount: controller.database.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 7,
-                                  childAspectRatio: 0.7,
-                                ),
-                            itemBuilder: (context, index) {
-                              final item = controller.database[index];
-                              return ItemCard(
-                                key: ValueKey(item['id']),
-                                itemName: item['data']['itemname'],
-                                price: item['data']['itemprice'],
-                                available: item['data']['isavailable'],
-                                quantity: item['quantity'],
-                                imageurl: item['image'],
-                                decrease: () =>
-                                    controller.decreasequantity(item['id']),
-                                increase: () =>
-                                    controller.increasequantity(item['id']),
-                                onedit: () => controller.onedit(
-                                  item['id'],
-                                  item['data']['isavailable'],
-                                  item['data']['itemname'],
-                                ),
-                                ondelete: () {
-                                  Get.defaultDialog(
-                                    title: 'Warning',
-                                    content: Text(
-                                      'Do you want to delete ${item['data']['itemname']}? ',
-                                    ),
-                                    confirm: ElevatedButton(
-                                      onPressed: () {
-                                        controller.ondelete(
-                                          item['id'],
-                                          item['data']['itemname'],
-                                        );
-                                        Get.back();
-                                      },
-                                      child: Text('Yes'),
-                                    ),
-                                    cancel: ElevatedButton(
-                                      onPressed: () => Get.back(),
-                                      child: Text('No'),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
+                    child: GridView.builder(
+                      itemCount: controller.database.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 7,
+                            childAspectRatio: 0.7,
                           ),
+                      itemBuilder: (context, index) {
+                        final item = controller.database[index];
+                        return ItemCard(
+                          key: ValueKey(item['id']),
+                          itemName: item['data']['itemname'],
+                          price: item['data']['itemprice'],
+                          available: item['data']['isavailable'],
+                          quantity: item['quantity'],
+                          imageurl: item['image'],
+                          decrease: () =>
+                              controller.decreasequantity(item['id']),
+                          increase: () =>
+                              controller.increasequantity(item['id']),
+                          onedit: () => controller.onedit(
+                            item['id'],
+                            item['data']['isavailable'],
+                            item['data']['itemname'],
+                          ),
+                          ondelete: () {
+                            Get.defaultDialog(
+                              title: 'Warning',
+                              content: Text(
+                                'Do you want to delete ${item['data']['itemname']}? ',
+                              ),
+                              confirm: ElevatedButton(
+                                onPressed: () {
+                                  controller.ondelete(
+                                    item['id'],
+                                    item['data']['itemname'],
+                                  );
+                                  Get.back();
+                                },
+                                child: Text('Yes'),
+                              ),
+                              cancel: ElevatedButton(
+                                onPressed: () => Get.back(),
+                                child: Text('No'),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
 
                   // 4. Overlay for Adding Items (Works even if list is empty)
@@ -114,17 +138,23 @@ class Homepage extends StatelessWidget {
   // Helper widget for full-screen loading
   Widget _loadingScreen(String message, Color color) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: color),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
+      body: Container(
+        color: Colors.transparent,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: color),
+              const SizedBox(height: 16),
+              Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

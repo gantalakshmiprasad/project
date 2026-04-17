@@ -331,7 +331,7 @@ AppBar appbar(Homepagecontroller controller) {
         tooltip: 'Bills',
 
         onPressed: () {
-          Get.toNamed('/billshistory');
+          Get.offAllNamed('/billshistory');
         },
         icon: Icon(Icons.history, color: Colors.white),
       ),

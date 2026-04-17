@@ -17,7 +17,8 @@ class Billshistory extends StatelessWidget {
         title: const Text("Bill History"),
         leading: IconButton(
           icon: const Icon(Icons.home),
-          onPressed: () => Get.back(), // or Navigator.pop(context)
+          onPressed: () =>
+              Get.toNamed('/homepage'), // or Navigator.pop(context)
         ),
       ),
       body: Obx(() {
@@ -54,7 +55,7 @@ class Billshistory extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 2),
+                  border: Border.all(color: Colors.black, width: 2),
                 ),
                 child: Column(
                   children: [

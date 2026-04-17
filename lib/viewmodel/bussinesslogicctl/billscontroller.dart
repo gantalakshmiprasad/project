@@ -13,7 +13,6 @@ class Billscontroller extends GetxController {
   void onInit() {
     super.onInit();
     fetchBills();
-    bills.map((element) => print(element));
   }
 
   Future<void> fetchBills() async {
@@ -25,14 +24,17 @@ class Billscontroller extends GetxController {
       final RowList allItems = await Get.find<Databaseservice>().fetchdata(
         user.$id,
         ApiConfig().billeditems,
-        [Query.limit(100)],
+        [Query.equal('restaurantid', user.$id), Query.limit(100)],
       );
 
       // 2. Get all unique bill headers
       final RowList allBills = await Get.find<Databaseservice>().fetchdata(
         user.$id,
         ApiConfig().bill,
-        [Query.orderAsc('billnumber')], // Show latest bills first
+        [
+          Query.equal('restaurantid', user.$id),
+          Query.orderAsc('billnumber'),
+        ], // Show latest bills first
       );
 
       final List temporaryList = [];

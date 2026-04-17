@@ -67,14 +67,14 @@ class Printcontroller extends GetxController {
         "items": itemsToSave,
         "total": currentTotal,
       };
-      print(receipt);
+
       final user = await Get.find<AuthServices>().getaccount();
       final data1 = {
         'billnumber': currentBillNo,
         'totalamount': currentTotal,
         'restaurantid': user.$id,
       };
-      print(data1);
+
       // 2. Database: Create the main bill entry
       // Use .value for RxInt, otherwise you pass the controller object, not the number
       await database.createEntry(data1, ApiConfig().bill);
@@ -89,7 +89,6 @@ class Printcontroller extends GetxController {
           'quantity': int.tryParse(item['quantity'].toString()),
           'restaurantid': user.$id,
         };
-        print(data);
         await database.createEntry(data, ApiConfig().billeditems);
       }
 

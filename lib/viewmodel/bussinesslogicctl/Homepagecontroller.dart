@@ -18,13 +18,14 @@ class Homepagecontroller extends GetxController {
   final RxList storedimages = [].obs;
   final RxBool issignedout = false.obs;
   final RxBool addclicked = false.obs;
-  final RxBool isitemsloading = false.obs;
+  final RxBool isitemsloading = true.obs;
   final printcontroller = Get.put(Printcontroller());
   final userid = ''.obs;
   final GlobalKey<FormState> formkey = GlobalKey<FormState>();
   final RxBool isimageclicked = false.obs;
   void opendialog() => addclicked.value = true;
   void closedialog() => addclicked.value = false;
+  final RxString message = ''.obs;
 
   final Databaseservice dbservice = Get.find<Databaseservice>();
   final AuthServices authservice = Get.find<AuthServices>();
@@ -37,7 +38,7 @@ class Homepagecontroller extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    isitemsloading.value = true;
+
     update();
     refreshDatabase();
     isitemsloading.value = false;
@@ -226,12 +227,15 @@ class Homepagecontroller extends GetxController {
   Future<void> refreshDatabase() async {
     try {
       final user = await authservice.getaccount();
-      final RowList rowlist = await dbservice
-          .fetchdata(user.$id, ApiConfig().productmodel, [
-            Query.equal('restaurantid', user.$id),
-            Query.limit(100),
-            Query.orderAsc('itemname'),
-          ]);
+      final RowList rowlist = await dbservice.fetchdata(
+        user.$id,
+        ApiConfig().productmodel,
+        [
+          Query.limit(100),
+          Query.orderAsc('itemname'),
+          Query.equal('userid', user.$id),
+        ],
+      );
 
       final freshdata = [];
       for (var row in rowlist.rows) {
@@ -248,7 +252,7 @@ class Homepagecontroller extends GetxController {
       database.clear();
       database.assignAll(freshdata);
     } catch (e) {
-      print("Error refreshing database: $e");
+      message.value = 'No items';
     } finally {
       database.refresh();
     }
