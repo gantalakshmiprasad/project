@@ -18,7 +18,7 @@ class Billshistory extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.home),
           onPressed: () =>
-              Get.toNamed('/homepage'), // or Navigator.pop(context)
+              Get.offAllNamed('/homepage'), // or Navigator.pop(context)
         ),
       ),
       body: Obx(() {

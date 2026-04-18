@@ -9,6 +9,7 @@ import 'package:firstproject/view/Authentication/signin.dart';
 import 'package:firstproject/view/Authentication/signup.dart';
 import 'package:firstproject/view/Authentication/verificationpage.dart';
 import 'package:firstproject/view/bussinesslogic/bills.dart';
+import 'package:firstproject/view/bussinesslogic/introductionpage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -53,7 +54,8 @@ class MyApp extends StatelessWidget {
 
       initialRoute: '/',
       getPages: [
-        GetPage(name: '/', page: () => LoginScreen()),
+        GetPage(name: '/login', page: () => LoginScreen()),
+        GetPage(name: '/', page: () => Introductionpage()),
         GetPage(name: '/signup', page: () => Signup()),
         GetPage(name: '/homepage', page: () => Homepage()),
         GetPage(name: '/verificationpage', page: () => Verificationpage()),
