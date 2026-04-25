@@ -15,7 +15,8 @@ class Signupcontroller extends GetxController {
     try {
       await authservice.signup(name, email, password);
       await authservice.login(email, password);
-      await dbservices.createEntry({
+      final user = await authservice.getaccount();
+      await dbservices.createEntry(user.$id, {
         'name': name,
         'email': email,
       }, ApiConfig().collectionId);

@@ -328,6 +328,26 @@ AppBar appbar(Homepagecontroller controller) {
     actionsPadding: EdgeInsets.only(right: 30),
     actions: [
       IconButton(
+        tooltip: 'Delete All items',
+
+        onPressed: () {
+          Get.defaultDialog(
+            content: Text(
+              'Do you want to delete all the items?',
+              style: TextStyle(fontSize: 20),
+            ),
+            contentPadding: EdgeInsets.all(25),
+            title: 'Warning',
+            onConfirm: () {
+              Get.back();
+              controller.deleteAllItems();
+            },
+            onCancel: () => Get.back(),
+          );
+        },
+        icon: Icon(Icons.delete, color: Colors.white),
+      ),
+      IconButton(
         tooltip: 'Bills',
 
         onPressed: () {

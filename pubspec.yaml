@@ -40,9 +40,10 @@ dependencies:
   appwrite: ^22.0.0
   auto_size_text: ^3.0.0
   google_fonts: ^8.0.2
+  pos_printer_d: ^1.0.3
   intl: ^0.20.2
- 
-
+  esc_pos_utils: ^1.1.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

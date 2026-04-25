@@ -20,6 +20,7 @@ class Databaseservice extends GetxService {
   }
 
   Future<Map<String, dynamic>> createEntry(
+    String userid,
     Map<String, dynamic> data,
     String tableid,
   ) async {
@@ -27,7 +28,7 @@ class Databaseservice extends GetxService {
       final document = await table.createRow(
         databaseId: ApiConfig().databaseId,
         tableId: tableid,
-        rowId: ID.unique(),
+        rowId: userid,
         data: data,
       );
 
@@ -41,11 +42,11 @@ class Databaseservice extends GetxService {
   }
 
   /// 2. READ - List documents (with optional filters)
-  Future<dynamic> getEntries(String rowId) async {
+  Future<dynamic> getEntries(String rowId, String tableid) async {
     try {
       final result = await table.getRow(
         databaseId: ApiConfig().databaseId,
-        tableId: ApiConfig().productmodel,
+        tableId: tableid,
         rowId: rowId,
       );
 

@@ -1,6 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/enums.dart';
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
 
@@ -10,12 +13,15 @@ import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart
 import 'package:get/get.dart';
 
 class Printcontroller extends GetxController {
+  final RxString bussinesstitle = ''.obs;
+  final RxString address = ''.obs;
   final RxList bills = [].obs;
   final RxList checkoutHistory = [].obs;
   final RxInt billno = 0.obs;
   final Databaseservice database = Get.find<Databaseservice>();
   final RxBool isloading = false.obs;
   final RxInt token = 1.obs;
+
   double get totalAmount => bills.fold(
     0.0,
     (sum, item) =>
@@ -39,6 +45,12 @@ class Printcontroller extends GetxController {
         // Sort highest to lowest
         Query.limit(1), // Only take the top one
       ]);
+      final bussinessinfo = await database.getEntries(
+        user.$id,
+        ApiConfig().profile,
+      );
+      bussinesstitle.value = bussinessinfo['bussinessname'];
+      address.value = bussinessinfo['address'];
       if (result.rows.isNotEmpty) {
         // Get the highest number and add 1
         int lastBill = result.rows.first.data['billnumber'];
@@ -77,7 +89,7 @@ class Printcontroller extends GetxController {
 
       // 2. Database: Create the main bill entry
       // Use .value for RxInt, otherwise you pass the controller object, not the number
-      await database.createEntry(data1, ApiConfig().bill);
+      await database.createEntry(ID.unique(), data1, ApiConfig().bill);
 
       // 3. Database: Save individual items
       // FIX: Loop through 'itemsToSave', because 'bills' gets cleared below!
@@ -89,7 +101,8 @@ class Printcontroller extends GetxController {
           'quantity': int.tryParse(item['quantity'].toString()),
           'restaurantid': user.$id,
         };
-        await database.createEntry(data, ApiConfig().billeditems);
+
+        await database.createEntry(ID.unique(), data, ApiConfig().billeditems);
       }
 
       // 4. UI/Local State Cleanup
@@ -97,10 +110,24 @@ class Printcontroller extends GetxController {
       bills.clear();
       billno.value++;
 
+      final execution = await Get.find<AuthServices>().function.createExecution(
+        functionId: ApiConfig().printfuntionid,
+        method: ExecutionMethod.pOST,
+        body: jsonEncode({
+          "shopName": bussinesstitle.value,
+          "address": address.value,
+          "invoiceNo": billno.value,
+          "items": itemsToSave,
+          "total": currentTotal,
+        }),
+      );
+
       // Increment for the next customer
+      final result = jsonDecode(execution.responseBody);
 
       // Reset quantities in the home controller
 
+      print(result['result']);
       homepagectl.isitemsloading.value = true;
 
       for (var item in homepagectl.database) {
@@ -113,6 +140,7 @@ class Printcontroller extends GetxController {
       token.value++;
     } catch (e) {
       print("Error saving receipt: $e");
+
       // Consider using Get.snackbar here to inform the user
     }
   }

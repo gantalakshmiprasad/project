@@ -46,9 +46,13 @@ class Printitems extends StatelessWidget {
               final now = DateTime.now();
               return Column(
                 children: [
-                  Defaultext(text: 'GLP Hotel', size: 25, color: Colors.black),
                   Defaultext(
-                    text: 'Near CSI church,ELuru',
+                    text: controller.bussinesstitle.value,
+                    size: 25,
+                    color: Colors.black,
+                  ),
+                  Defaultext(
+                    text: controller.address.value,
                     size: 15,
                     color: Colors.black54,
                   ),

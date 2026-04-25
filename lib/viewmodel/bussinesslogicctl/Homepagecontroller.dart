@@ -15,10 +15,11 @@ import 'package:get/get.dart';
 class Homepagecontroller extends GetxController {
   final service = Get.find<AuthServices>();
   final RxList database = [].obs;
+
   final RxList storedimages = [].obs;
   final RxBool issignedout = false.obs;
   final RxBool addclicked = false.obs;
-  final RxBool isitemsloading = true.obs;
+  final RxBool isitemsloading = false.obs;
   final printcontroller = Get.put(Printcontroller());
   final userid = ''.obs;
   final GlobalKey<FormState> formkey = GlobalKey<FormState>();
@@ -38,15 +39,14 @@ class Homepagecontroller extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-
     update();
     refreshDatabase();
-    isitemsloading.value = false;
   }
 
   Future<void> submit(String promptText, String price) async {
     try {
       closedialog();
+
       isitemsloading.value = true;
 
       final user = await authservice.getaccount(); //getting userid
@@ -62,7 +62,11 @@ class Homepagecontroller extends GetxController {
         quantity: 0,
       );
 
-      await dbservice.createEntry(product.toMap(), ApiConfig().productmodel);
+      await dbservice.createEntry(
+        ID.unique(),
+        product.toMap(),
+        ApiConfig().productmodel,
+      );
       database.add({
         'id': user.$id,
         'data': product.toMap(),
@@ -226,6 +230,7 @@ class Homepagecontroller extends GetxController {
 
   Future<void> refreshDatabase() async {
     try {
+      isitemsloading.value = true;
       final user = await authservice.getaccount();
       final RowList rowlist = await dbservice.fetchdata(
         user.$id,
@@ -255,6 +260,8 @@ class Homepagecontroller extends GetxController {
       message.value = 'No items';
     } finally {
       database.refresh();
+
+      isitemsloading.value = false;
     }
   }
 
@@ -267,10 +274,47 @@ class Homepagecontroller extends GetxController {
         "$itemname is deleted",
         backgroundColor: Colors.green,
         colorText: Colors.white,
+        showProgressIndicator: true,
       );
       refreshDatabase();
     } catch (e) {
       throw e.toString();
+    }
+  }
+
+  // Inside Homepagecontroller class
+
+  Future<void> deleteAllItems() async {
+    try {
+      isitemsloading.value = true;
+
+      // Create a list of delete futures
+      final deleteFutures = database.map((item) {
+        return dbservice.deleteEntry(item['id'], ApiConfig().productmodel);
+      }).toList();
+
+      // Wait for all deletions to complete in Appwrite
+      await Future.wait(deleteFutures);
+
+      // Clear the local list and UI
+      database.clear();
+      printcontroller.bills.clear(); // Also clear active bills
+
+      Get.snackbar(
+        'Success',
+        'All items deleted successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to delete items: ${e.toString()}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isitemsloading.value = false;
     }
   }
 
