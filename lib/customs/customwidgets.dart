@@ -327,6 +327,12 @@ AppBar appbar(Homepagecontroller controller) {
     ),
     actionsPadding: EdgeInsets.only(right: 30),
     actions: [
+      TextButton(
+        onPressed: () {
+          Get.toNamed('/paymentpage');
+        },
+        child: Text('Subscription', style: TextStyle(color: Colors.white)),
+      ),
       IconButton(
         tooltip: 'Delete All items',
 

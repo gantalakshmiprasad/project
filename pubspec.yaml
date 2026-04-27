@@ -43,6 +43,7 @@ dependencies:
   pos_printer_d: ^1.0.3
   intl: ^0.20.2
   esc_pos_utils: ^1.1.0
+  razorpay_flutter: ^1.4.4
   
 dev_dependencies:
   flutter_test:

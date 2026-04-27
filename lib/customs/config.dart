@@ -17,4 +17,6 @@ class ApiConfig {
   final String devkey =
       'e9fc66da0e6a486bca31eeee9654ee7065815126fdbef76f61cad4d4bc498225ef1d37d136e826715464c0208d37538bb87d6133ce1caa50841e6d0c006ca651a7f4dbb3dc1b7ebf4a92d0236ed13ce669964792de8ec64bdeb8be2dfe9772d77c3b1c22cadf14b07724c6b8996dd3d7c6ccf89409564b73c159588b1469c863';
   final String printfuntionid = '69e9ea90002ec13346bd';
+  final String razorpayapi = 'rzp_test_SiVaf7QpFqc459';
+  final String razorpaysecret = 'pYGWyn6r3cypdKEwH2VPe7JP';
 }

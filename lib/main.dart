@@ -11,6 +11,7 @@ import 'package:firstproject/view/Authentication/verificationpage.dart';
 import 'package:firstproject/view/bussinesslogic/billprintview.dart';
 import 'package:firstproject/view/bussinesslogic/bills.dart';
 import 'package:firstproject/view/bussinesslogic/introductionpage.dart';
+import 'package:firstproject/view/bussinesslogic/paymentpage.dart';
 import 'package:firstproject/view/bussinesslogic/profilepage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,10 +55,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
 
-      initialRoute: '/printer',
+      initialRoute: '/',
       getPages: [
-        GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/', page: () => Introductionpage()),
+        GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/signup', page: () => Signup()),
         GetPage(name: '/homepage', page: () => Homepage()),
         GetPage(name: '/verificationpage', page: () => Verificationpage()),
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/Resetpassword', page: () => Resetpassword()),
         GetPage(name: '/billshistory', page: () => Billshistory()),
         GetPage(name: '/profilepage', page: () => Profilepage()),
+        GetPage(name: '/paymentpage', page: () => Paymentpage()),
       ],
     );
   }
