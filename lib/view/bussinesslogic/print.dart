@@ -12,26 +12,15 @@ class Printitems extends StatelessWidget {
     final controller = Get.put(Printcontroller());
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color.fromARGB(252, 10, 45, 37),
       body: Obx(() {
-        final isDark = Get.isDarkMode;
-        Color activeAccent = isDark
-            ? const Color(0xFF2DD4BF)
-            : const Color(0xFF0D9488);
-        Color priceColor = isDark
-            ? const Color(0xFFF59E0B)
-            : const Color(0xFFD97706);
-        Color mainText = isDark
-            ? Colors.white
-            : const Color.fromARGB(255, 239, 237, 237);
-
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 12),
-              // CRITICAL FIX: Repositioned print execution module directly to the right side of the main title header layout
+              // Main title header layout with print button
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -44,20 +33,17 @@ class Printitems extends StatelessWidget {
                           maxLines: 1,
                           maxFontSize: 22,
                           minFontSize: 16,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.w900,
-                            color: mainText,
+                            color: Colors.white,
                             letterSpacing: 0.5,
                           ),
                         ),
                         Text(
                           controller.address.value,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
-                            color: isDark
-                                ? Colors.white54
-                                : const Color(0xFF64748B),
-                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
                           ),
                         ),
                       ],
@@ -66,6 +52,7 @@ class Printitems extends StatelessWidget {
                   const SizedBox(width: 12),
                   IconButton.filled(
                     style: IconButton.styleFrom(
+                      backgroundColor: const Color(0xFFF1F5F9),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -73,7 +60,7 @@ class Printitems extends StatelessWidget {
                     onPressed: () => controller.printReceipt(),
                     icon: const Icon(
                       Icons.print_rounded,
-                      color: Color.fromARGB(255, 8, 9, 9),
+                      color: Color(0xFF1E293B),
                       size: 22,
                     ),
                     tooltip: 'Print Out',
@@ -81,22 +68,14 @@ class Printitems extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              Divider(
-                color: isDark ? const Color(0xFF1E4D55) : Colors.grey.shade200,
-                thickness: 1,
-              ),
+              Divider(color: Colors.grey.shade200, thickness: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildMetaLabelValue(
-                    'Time',
-                    TimeOfDay.now().format(context),
-                    isDark,
-                  ),
+                  _buildMetaLabelValue('Time', TimeOfDay.now().format(context)),
                   _buildMetaLabelValue(
                     'Date',
                     "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
-                    isDark,
                   ),
                 ],
               ),
@@ -104,15 +83,9 @@ class Printitems extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF0B1517)
-                      : const Color(0xFFF8FAFC),
+                  color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF1E4D55)
-                        : Colors.grey.shade200,
-                  ),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -120,21 +93,17 @@ class Printitems extends StatelessWidget {
                     _buildBadgeMetric(
                       'TOKEN NO',
                       controller.token.value.toString(),
-                      activeAccent,
-                      isDark,
+                      const Color.fromARGB(255, 10, 10, 10),
                     ),
                     Container(
                       width: 1,
                       height: 24,
-                      color: isDark
-                          ? const Color(0xFF1E4D55)
-                          : Colors.grey.shade200,
+                      color: Colors.grey.shade200,
                     ),
                     _buildBadgeMetric(
                       'BILL NO',
                       controller.billno.value.toString(),
-                      priceColor,
-                      isDark,
+                      const Color.fromARGB(255, 2, 2, 2),
                     ),
                   ],
                 ),
@@ -146,13 +115,13 @@ class Printitems extends StatelessWidget {
                   children: [
                     Expanded(
                       flex: 3,
-                      child: _buildTableHeader('Item Name', activeAccent),
+                      child: _buildTableHeader('Item Name', Colors.white),
                     ),
                     Expanded(
                       flex: 1,
                       child: _buildTableHeader(
                         'Price',
-                        activeAccent,
+                        Colors.white,
                         align: TextAlign.center,
                       ),
                     ),
@@ -160,7 +129,7 @@ class Printitems extends StatelessWidget {
                       flex: 1,
                       child: _buildTableHeader(
                         'Qty',
-                        activeAccent,
+                        Colors.white,
                         align: TextAlign.center,
                       ),
                     ),
@@ -168,7 +137,7 @@ class Printitems extends StatelessWidget {
                       flex: 1,
                       child: _buildTableHeader(
                         'Amount',
-                        activeAccent,
+                        Colors.white,
                         align: TextAlign.right,
                       ),
                     ),
@@ -176,10 +145,7 @@ class Printitems extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              Divider(
-                color: isDark ? const Color(0xFF1E4D55) : Colors.grey.shade200,
-                thickness: 1,
-              ),
+              Divider(color: Colors.grey.shade200, thickness: 1),
               Expanded(
                 child: controller.isloading.value
                     ? Center(
@@ -201,11 +167,7 @@ class Printitems extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               border: Border(
-                                bottom: BorderSide(
-                                  color: isDark
-                                      ? const Color(0xFF1E4D55)
-                                      : Colors.grey.shade100,
-                                ),
+                                bottom: BorderSide(color: Colors.grey.shade100),
                               ),
                             ),
                             child: Row(
@@ -215,8 +177,8 @@ class Printitems extends StatelessWidget {
                                   child: AutoSizeText(
                                     item['itemname'] ??
                                         'System Inventory Asset',
-                                    style: TextStyle(
-                                      color: mainText,
+                                    style: const TextStyle(
+                                      color: Color.fromARGB(255, 215, 215, 215),
                                       fontWeight: FontWeight.w600,
                                       fontSize: 15,
                                     ),
@@ -229,10 +191,8 @@ class Printitems extends StatelessWidget {
                                   child: Text(
                                     "${item['itemprice'] ?? '0'}",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? Colors.white70
-                                          : const Color(0xFF64748B),
+                                    style: const TextStyle(
+                                      color: Colors.white,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -242,8 +202,8 @@ class Printitems extends StatelessWidget {
                                   child: Text(
                                     "${item['quantity'] ?? '0'}",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: activeAccent,
+                                    style: const TextStyle(
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -254,8 +214,8 @@ class Printitems extends StatelessWidget {
                                   child: Text(
                                     "₹${item['amount'] ?? '0'}",
                                     textAlign: TextAlign.right,
-                                    style: TextStyle(
-                                      color: priceColor,
+                                    style: const TextStyle(
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -267,47 +227,40 @@ class Printitems extends StatelessWidget {
                         },
                       ),
               ),
-              Divider(
-                color: isDark ? const Color(0xFF1E4D55) : Colors.grey.shade300,
-                thickness: 1.5,
-              ),
+              Divider(color: Colors.grey.shade300, thickness: 1.5),
               Container(
                 margin: const EdgeInsets.only(bottom: 16, top: 4),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [const Color(0xFF14353B), const Color(0xFF0B1517)]
-                        : [Colors.white, const Color(0xFFF1F5F9)],
+                  gradient: const LinearGradient(
+                    colors: [Colors.white, Color(0xFFF1F5F9)],
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark ? activeAccent : Colors.grey.shade200,
-                  ),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'TOTAL OUTFLOW',
+                    const Text(
+                      'TOTAL',
                       style: TextStyle(
-                        color: mainText,
+                        color: Color.fromARGB(255, 12, 10, 10),
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
                     ),
                     Text(
                       'Items: ${controller.totalQuantity}',
-                      style: TextStyle(
-                        color: activeAccent,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 6, 6, 6),
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     Text(
                       '₹${controller.totalAmount}',
-                      style: TextStyle(
-                        color: priceColor,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 12, 12, 12),
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -322,21 +275,21 @@ class Printitems extends StatelessWidget {
     );
   }
 
-  Widget _buildMetaLabelValue(String label, String value, bool isDark) {
+  Widget _buildMetaLabelValue(String label, String value) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           '$label: ',
-          style: TextStyle(
-            color: isDark ? Colors.white38 : const Color(0xFF64748B),
+          style: const TextStyle(
+            color: Color.fromARGB(255, 255, 255, 255),
             fontSize: 13,
           ),
         ),
         Text(
           value,
-          style: TextStyle(
-            color: isDark ? Colors.white70 : const Color(0xFF1E293B),
+          style: const TextStyle(
+            color: Color.fromARGB(255, 231, 233, 235),
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
@@ -345,20 +298,15 @@ class Printitems extends StatelessWidget {
     );
   }
 
-  Widget _buildBadgeMetric(
-    String title,
-    String value,
-    Color color,
-    bool isDark,
-  ) {
+  Widget _buildBadgeMetric(String title, String value, Color color) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 10,
-            color: isDark ? Colors.white38 : const Color(0xFF64748B),
+            color: Color.fromARGB(255, 2, 3, 3),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -377,7 +325,7 @@ class Printitems extends StatelessWidget {
 
   Widget _buildTableHeader(
     String text,
-    Color activeAccent, {
+    Color headerColor, {
     TextAlign align = TextAlign.left,
   }) {
     return Text(
@@ -385,7 +333,7 @@ class Printitems extends StatelessWidget {
       textAlign: align,
       style: TextStyle(
         fontSize: 11,
-        color: activeAccent,
+        color: headerColor,
         fontWeight: FontWeight.bold,
       ),
     );

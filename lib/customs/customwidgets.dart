@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'package:firstproject/viewmodel/bussinesslogicctl/themecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:get/get.dart';
@@ -15,7 +14,6 @@ Widget buildTextField({
   bool isPassword = false,
   required TextEditingController controller,
 }) {
-  final isDark = Get.isDarkMode;
   return TextFormField(
     controller: controller,
     validator: (value) {
@@ -25,28 +23,18 @@ Widget buildTextField({
       return null;
     },
     obscureText: isPassword,
-    style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
     decoration: InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(
-        color: isDark ? Colors.white38 : Colors.black38,
-        fontSize: 14,
-      ),
+      hintStyle: const TextStyle(fontSize: 14),
       filled: true,
-      fillColor: isDark ? const Color(0xFF0B1517) : const Color(0xFFF1F5F9),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(
-          color: isDark ? const Color(0xFF1E4D55) : Colors.grey.shade300,
-        ),
+        borderSide: BorderSide(color: Colors.grey.shade300),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(
-          color: isDark ? const Color(0xFF2DD4BF) : const Color(0xFF0D9488),
-          width: 1.5,
-        ),
+        borderSide: const BorderSide(width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -71,7 +59,6 @@ class ItemCard extends StatelessWidget {
   final Uint8List imageurl;
   final Callback onedit;
   final Callback ondelete;
-  final bool isdark;
 
   const ItemCard({
     super.key,
@@ -84,45 +71,25 @@ class ItemCard extends StatelessWidget {
     required this.imageurl,
     required this.onedit,
     required this.ondelete,
-    required this.isdark,
   });
 
   @override
   Widget build(BuildContext context) {
     bool isSelected = quantity > 0;
-    final isDark = isdark;
 
-    Color activeAccent = isDark
-        ? const Color(0xFF2DD4BF)
-        : const Color(0xFF0D9488);
-    Color priceColor = isDark
-        ? const Color(0xFFF59E0B)
-        : const Color(0xFFD97706);
-
-    return Stack(
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0F262A) : Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: !available
-                  ? const Color(0xFFFB7185)
-                  : isSelected
-                  ? activeAccent
-                  : (isDark ? const Color(0xFF1E4D55) : Colors.grey.shade200),
-              width: isSelected ? 2.0 : 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: isSelected ? activeAccent : Colors.black12,
-                blurRadius: isSelected ? 5 : 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipRRect(
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: available ? Colors.black : Colors.red),
+        borderRadius: BorderRadius.circular(24),
+        color: available
+            ? isSelected
+                  ? Colors.orange
+                  : const Color.fromARGB(230, 0, 55, 77)
+            : Colors.red,
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: Opacity(
               opacity: available ? 1.0 : 0.8,
@@ -138,9 +105,7 @@ class ItemCard extends StatelessWidget {
                           height: double.infinity,
                           child: Image.memory(imageurl, fit: BoxFit.cover),
                         ),
-                        Positioned.fill(
-                          child: Container(decoration: const BoxDecoration()),
-                        ),
+
                         if (isSelected && available)
                           Positioned(
                             top: 12,
@@ -151,17 +116,15 @@ class ItemCard extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: activeAccent,
                                 borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
                               ),
                               child: Text(
                                 "$quantity Selected",
-                                style: TextStyle(
-                                  color: isDark
-                                      ? const Color(0xFF0B1517)
-                                      : Colors.white,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
+                                  color: Colors.green,
                                 ),
                               ),
                             ),
@@ -174,15 +137,12 @@ class ItemCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // FIX: Substantially bumped layout typography size for scannability
                         Text(
                           itemName,
-                          style: TextStyle(
-                            fontSize: 18, // Increased from 14
+                          style: const TextStyle(
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF1E293B),
+                            color: Colors.white,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -190,12 +150,10 @@ class ItemCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         AutoSizeText(
                           "₹$price",
-                          style: TextStyle(
-                            fontSize: 20, // Increased from 18
+                          style: const TextStyle(
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: available
-                                ? priceColor
-                                : const Color(0xFFFB7185),
+                            color: Colors.white,
                           ),
                           maxLines: 1,
                         ),
@@ -203,63 +161,55 @@ class ItemCard extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Divider(
-                    color: isDark
-                        ? const Color.fromARGB(255, 17, 178, 206)
-                        : Colors.grey.shade200,
-                    height: 1,
-                  ),
-                  SizedBox(
-                    height: 52,
-                    child: _buildInteractionControls(isDark, activeAccent),
-                  ),
+                  const Divider(height: 1),
+                  SizedBox(height: 52, child: _buildInteractionControls()),
                 ],
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 6,
-          right: 6,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                tooltip: available ? 'Mark sold out' : 'Mark available',
-                onPressed: onedit,
-                constraints: const BoxConstraints(),
-                padding: const EdgeInsets.all(6),
-                icon: Icon(
-                  available ? Icons.check_circle : Icons.do_not_disturb_on,
-                  color: available ? activeAccent : const Color(0xFFFB7185),
-                  size: 22,
+          Positioned(
+            top: 6,
+            right: 6,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  tooltip: available ? 'Mark sold out' : 'Mark available',
+                  onPressed: onedit,
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(6),
+                  icon: Icon(
+                    available ? Icons.check_circle : Icons.do_not_disturb_on,
+                    color: available ? Colors.green : const Color(0xFFFB7185),
+                    size: 22,
+                  ),
                 ),
-              ),
-              IconButton(
-                tooltip: 'delete item',
-                onPressed: ondelete,
-                constraints: const BoxConstraints(),
-                padding: const EdgeInsets.all(6),
-                icon: const Icon(
-                  Icons.delete_outline_rounded,
-                  color: Color(0xFFFB7185),
-                  size: 22,
+                IconButton(
+                  tooltip: 'delete item',
+                  onPressed: ondelete,
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(6),
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    color: Color(0xFFFB7185),
+                    size: 22,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildInteractionControls(bool isDark, Color activeAccent) {
+  Widget _buildInteractionControls() {
     if (!available) {
       return const Center(
         child: Text(
           'OUT OF STOCK',
           style: TextStyle(
-            color: Color(0xFFFB7185),
+            color: Colors.white,
             fontSize: 13,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
@@ -270,12 +220,7 @@ class ItemCard extends StatelessWidget {
 
     bool hasItem = quantity > 0;
 
-    return Container(
-      color: hasItem
-          ? (isDark
-                ? const Color.fromARGB(255, 1, 49, 57)
-                : const Color(0xFFCCFBF1))
-          : Colors.transparent,
+    return SizedBox(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -286,34 +231,24 @@ class ItemCard extends StatelessWidget {
                 child: Icon(
                   Icons.remove,
                   size: 25,
-                  color: hasItem
-                      ? activeAccent
-                      : (isDark ? Colors.white : Colors.black38),
+                  color: hasItem ? Colors.white : Colors.white60,
                 ),
               ),
             ),
           ),
-
           Expanded(
             child: Center(
               child: Text(
                 '$quantity',
-                style: TextStyle(
-                  color: hasItem
-                      ? activeAccent
-                      : (isDark ? Colors.white : const Color(0xFF1E293B)),
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 25),
               ),
             ),
           ),
-
           Expanded(
             child: InkWell(
               onTap: increase,
               child: Center(
-                child: Icon(Icons.add, size: 25, color: activeAccent),
+                child: Icon(Icons.add, size: 25, color: Colors.white),
               ),
             ),
           ),
@@ -340,21 +275,17 @@ class Itemdialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Get.isDarkMode;
     return Material(
       color: Colors.transparent,
       child: Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F262A) : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: isDark ? const Color(0xFF2DD4BF) : Colors.grey.shade300,
-            width: 1.5,
-          ),
+          border: Border.all(color: Colors.grey.shade300, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: isDark ? Colors.black45 : Colors.grey.shade400,
+              color: Colors.grey.shade400,
               spreadRadius: 5,
               blurRadius: 25,
             ),
@@ -366,10 +297,10 @@ class Itemdialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Add New Inventory Item',
                 style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: Color(0xFF1E293B),
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -383,9 +314,7 @@ class Itemdialog extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark
-                        ? const Color(0xFF2DD4BF)
-                        : const Color(0xFF0D9488),
+                    backgroundColor: const Color(0xFF0D9488),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -393,10 +322,10 @@ class Itemdialog extends StatelessWidget {
                     elevation: 0,
                   ),
                   onPressed: submit,
-                  child: Text(
+                  child: const Text(
                     'Save to Catalog',
                     style: TextStyle(
-                      color: isDark ? const Color(0xFF0B1517) : Colors.white,
+                      color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
@@ -426,19 +355,10 @@ class Defaultext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Get.isDarkMode;
-    // FIX: Fallback logic prevents elements from masking completely inside dark canvases
-    Color functionalColor = color;
-    if (isDark && (color == Colors.black || color == const Color(0xFF1E293B))) {
-      functionalColor = Colors.white;
-    } else if (!isDark && color == Colors.white) {
-      functionalColor = const Color(0xFF1E293B);
-    }
-
     return Text(
       text,
       style: TextStyle(
-        color: functionalColor,
+        color: color,
         fontSize: size,
         fontWeight: FontWeight.bold,
       ),
@@ -447,15 +367,12 @@ class Defaultext extends StatelessWidget {
 }
 
 Widget addbutton(Homepagecontroller controller) {
-  final isDark = Get.isDarkMode;
   return Padding(
     padding: const EdgeInsets.all(12),
     child: FloatingActionButton(
-      backgroundColor: isDark
-          ? const Color(0xFFF59E0B)
-          : const Color(0xFFD97706),
+      backgroundColor: const Color(0xFFD97706),
       onPressed: () => controller.opendialog(),
-      child: Icon(Icons.add, color: isDark ? Colors.black : Colors.white),
+      child: const Icon(Icons.add, color: Colors.white),
     ),
   );
 }
@@ -482,7 +399,7 @@ Stack itemform(Homepagecontroller controller) {
       Padding(
         padding: const EdgeInsets.all(16.0),
         child: IconButton(
-          color: Get.isDarkMode ? Colors.white60 : Colors.black54,
+          color: Colors.black54,
           hoverColor: Colors.black12,
           onPressed: () => controller.closedialog(),
           icon: const Icon(Icons.close_rounded, size: 24),
@@ -493,84 +410,54 @@ Stack itemform(Homepagecontroller controller) {
 }
 
 AppBar appbar(Homepagecontroller controller) {
-  final themeCtrl = Get.find<ThemeController>();
-
   return AppBar(
-    backgroundColor: Get.isDarkMode ? const Color(0xFF0F262A) : Colors.white,
+    backgroundColor: const Color.fromARGB(255, 0, 117, 109),
     elevation: 0,
     bottom: PreferredSize(
       preferredSize: const Size.fromHeight(1),
-      child: Container(
-        color: Get.isDarkMode ? const Color(0xFF1E4D55) : Colors.grey.shade200,
-        height: 1,
-      ),
+      child: Container(color: Colors.grey.shade200, height: 1),
     ),
     automaticallyImplyLeading: Get.width <= 900,
-    iconTheme: IconThemeData(
-      color: Get.isDarkMode ? Colors.white70 : const Color(0xFF1E293B),
-    ),
+    iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
     title: Row(
       children: [
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: Get.isDarkMode
-                ? const Color(0xFF2DD4BF)
-                : const Color(0xFF0D9488),
+            color: const Color(0xFF0D9488),
             borderRadius: BorderRadius.circular(8),
           ),
           child: const Icon(Icons.bolt, size: 22, color: Colors.white),
         ),
         const SizedBox(width: 12),
-        Text(
+        const Text(
           'UBS Workspace',
           style: TextStyle(
-            color: Get.isDarkMode ? Colors.white : const Color(0xFF1E293B),
+            color: Color.fromARGB(255, 230, 232, 235),
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
         ),
       ],
     ),
-    actions: [
-      // FIX: Wrapped theme switch button with Obx to guarantee immediate visual state updates
-      Obx(() {
-        final darkState = themeCtrl.isDark;
-        return IconButton(
-          tooltip: 'Toggle Theme Layout',
-          icon: Icon(
-            darkState ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-            color: darkState
-                ? const Color(0xFFF59E0B)
-                : const Color(0xFF64748B),
-          ),
-          onPressed: () {
-            ThemeMode targetMode = Get.isDarkMode
-                ? ThemeMode.light
-                : ThemeMode.dark;
-            Get.changeThemeMode(targetMode);
+    actionsPadding: EdgeInsets.symmetric(horizontal: 35),
 
-            // Sync up theme changes with controller status flag parameters if tracking reactively
-          },
-        );
-      }),
+    actions: [
       TextButton(
         onPressed: () => Get.toNamed('/analytics'),
-        child: Text('Analytics', style: TextStyle(color: Colors.white)),
+        child: const Text('Analytics', style: TextStyle(color: Colors.white)),
       ),
       TextButton.icon(
         onPressed: () => Get.toNamed('/paymentpage'),
-        icon: Icon(
+        icon: const Icon(
           Icons.stars_rounded,
-          color: Get.isDarkMode
-              ? const Color(0xFFF59E0B)
-              : const Color(0xFFD97706),
+          color: Color(0xFFD97706),
           size: 18,
         ),
-        label: Text(
+        label: const Text(
           'Plans',
           style: TextStyle(
-            color: Get.isDarkMode ? Colors.white : const Color(0xFF1E293B),
+            color: Color.fromARGB(255, 254, 254, 255),
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
@@ -586,57 +473,51 @@ AppBar appbar(Homepagecontroller controller) {
         IconButton(
           tooltip: 'Ledger Registry History',
           onPressed: () => Get.offAllNamed('/billshistory'),
-          icon: Icon(
+          icon: const Icon(
             Icons.history_toggle_off_rounded,
-            color: Get.isDarkMode ? Colors.white70 : const Color(0xFF64748B),
+            color: Colors.white,
           ),
         ),
         IconButton(
           tooltip: 'Manual Entry Append',
           onPressed: () => controller.opendialog(),
-          icon: Icon(
-            Icons.add_box_outlined,
-            color: Get.isDarkMode ? Colors.white70 : const Color(0xFF64748B),
-          ),
+          icon: const Icon(Icons.add_box_outlined, color: Colors.white),
         ),
         IconButton(
           tooltip: 'Log Out Session',
           onPressed: () => _handleLogoutSignOut(controller),
-          icon: const Icon(Icons.logout_rounded, color: Color(0xFFFB7185)),
+          icon: const Icon(
+            Icons.logout_rounded,
+            color: Color.fromARGB(255, 255, 128, 82),
+          ),
         ),
       ],
-      const SizedBox(width: 16),
     ],
   );
 }
 
 Widget buildMobileNavigationDrawer(Homepagecontroller controller) {
-  final isDark = Get.isDarkMode;
   return Drawer(
     child: Container(
-      color: isDark ? const Color(0xFF0F262A) : Colors.white,
+      color: Colors.white,
       child: Column(
         children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF07171A) : const Color(0xFFF1F5F9),
-            ),
+          const DrawerHeader(
+            decoration: BoxDecoration(color: Color(0xFFF1F5F9)),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.analytics_outlined,
-                    color: isDark
-                        ? const Color(0xFF2DD4BF)
-                        : const Color(0xFF0D9488),
+                    color: Color(0xFF0D9488),
                     size: 44,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text(
                     "Universal Billing Engine",
                     style: TextStyle(
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: Color(0xFF1E293B),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -646,15 +527,13 @@ Widget buildMobileNavigationDrawer(Homepagecontroller controller) {
             ),
           ),
           ListTile(
-            leading: Icon(
+            leading: const Icon(
               Icons.add_box_outlined,
-              color: isDark ? Colors.white70 : const Color(0xFF64748B),
+              color: Color(0xFF64748B),
             ),
-            title: Text(
+            title: const Text(
               'Append Catalog Item',
-              style: TextStyle(
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
+              style: TextStyle(color: Color(0xFF1E293B)),
             ),
             onTap: () {
               Get.back();
@@ -662,15 +541,13 @@ Widget buildMobileNavigationDrawer(Homepagecontroller controller) {
             },
           ),
           ListTile(
-            leading: Icon(
+            leading: const Icon(
               Icons.history_rounded,
-              color: isDark ? Colors.white70 : const Color(0xFF64748B),
+              color: Color(0xFF64748B),
             ),
-            title: Text(
+            title: const Text(
               'Ledger History Logs',
-              style: TextStyle(
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
+              style: TextStyle(color: Color(0xFF1E293B)),
             ),
             onTap: () {
               Get.back();
@@ -678,7 +555,7 @@ Widget buildMobileNavigationDrawer(Homepagecontroller controller) {
             },
           ),
           const Spacer(),
-          Divider(color: isDark ? Colors.white12 : Colors.grey.shade200),
+          Divider(color: Colors.grey.shade200),
           ListTile(
             leading: const Icon(Icons.logout_rounded, color: Color(0xFFFB7185)),
             title: const Text(
@@ -701,9 +578,8 @@ Widget buildMobileNavigationDrawer(Homepagecontroller controller) {
 }
 
 void _showDeleteAllItemsDialog(Homepagecontroller controller) {
-  final isDark = Get.isDarkMode;
   Get.defaultDialog(
-    backgroundColor: isDark ? const Color(0xFF0F262A) : Colors.white,
+    backgroundColor: Colors.white,
     title: 'Purge Directory Catalog?',
     titleStyle: const TextStyle(
       fontWeight: FontWeight.bold,
@@ -711,13 +587,9 @@ void _showDeleteAllItemsDialog(Homepagecontroller controller) {
       fontSize: 18,
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-    content: Text(
+    content: const Text(
       'This will clear out your local cache directory completely. This structural operation cannot be undone.',
-      style: TextStyle(
-        color: isDark ? Colors.white70 : const Color(0xFF64748B),
-        fontSize: 14,
-        height: 1.4,
-      ),
+      style: TextStyle(color: Color(0xFF64748B), fontSize: 14, height: 1.4),
       textAlign: TextAlign.center,
     ),
     confirm: ElevatedButton(
@@ -736,15 +608,10 @@ void _showDeleteAllItemsDialog(Homepagecontroller controller) {
     ),
     cancel: OutlinedButton(
       style: OutlinedButton.styleFrom(
-        side: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
+        side: BorderSide(color: Colors.grey.shade300),
       ),
       onPressed: () => Get.back(),
-      child: Text(
-        'Abort',
-        style: TextStyle(
-          color: isDark ? Colors.white70 : const Color(0xFF64748B),
-        ),
-      ),
+      child: const Text('Abort', style: TextStyle(color: Color(0xFF64748B))),
     ),
   );
 }

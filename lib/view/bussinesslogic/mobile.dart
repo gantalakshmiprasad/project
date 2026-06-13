@@ -1,9 +1,8 @@
 import 'package:firstproject/customs/customwidgets.dart';
-import 'package:firstproject/view/bussinesslogic/bills.dart';
+import 'package:firstproject/view/bussinesslogic/billprintview.dart';
 import 'package:firstproject/view/bussinesslogic/print.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/billscontroller.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/printcontroller.dart';
-import 'package:firstproject/viewmodel/bussinesslogicctl/themecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -87,7 +86,7 @@ class Mobile extends StatelessWidget {
         ),
         body: () {
           if (controller.currentindex.value == 1) {
-            return Billshistory();
+            return PhysicalGetxCalendarPage();
           } else if (controller.currentindex.value == 2) {
             return const Printitems();
           }
@@ -131,7 +130,6 @@ class Mobile extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final item = controller.database[index];
                           return ItemCard(
-                            isdark: Get.find<ThemeController>().isDark,
                             key: ValueKey(item['id']),
                             itemName: item['data']['itemname'],
                             price: item['data']['itemprice'],

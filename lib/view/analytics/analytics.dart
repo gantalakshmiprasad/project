@@ -10,27 +10,21 @@ class Analytics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(Analyticscontroller());
-    final isDark = Get.isDarkMode;
 
-    Color mainText = isDark ? Colors.white : const Color(0xFF1E293B);
-    Color activeAccent = isDark
-        ? const Color(0xFF2DD4BF)
-        : const Color(0xFF0D9488);
-    Color priceColor = isDark
-        ? const Color(0xFFF59E0B)
-        : const Color(0xFFD97706);
-    Color surfaceColor = isDark ? const Color(0xFF111827) : Colors.white;
+    // Cleaned light UI layout configuration variables
+    const Color mainText = Color.fromARGB(255, 235, 238, 243);
+    const Color accentColor = Color(0xFF0D9488);
+    const Color priceColor = Color.fromARGB(255, 255, 190, 10);
+    const Color surfaceColor = Color.fromARGB(255, 1, 91, 101);
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF0B1214)
-          : const Color(0xFFF8FAFC),
+      backgroundColor: const Color.fromARGB(254, 13, 69, 55),
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        backgroundColor: isDark ? const Color(0xFF111827) : Colors.white,
+        backgroundColor: const Color.fromARGB(253, 1, 52, 39),
         elevation: 0,
-        iconTheme: IconThemeData(color: mainText),
-        title: Text(
+        iconTheme: const IconThemeData(color: mainText),
+        title: const Text(
           'Store Performance Analytics',
           style: TextStyle(
             color: mainText,
@@ -39,6 +33,10 @@ class Analytics extends StatelessWidget {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => Get.offAllNamed('/homepage'),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () => controller.fetchTransactionsFromBackend(),
@@ -76,10 +74,10 @@ class Analytics extends StatelessWidget {
                           isToday
                               ? "TODAY'S ANALYSIS SUMMARY"
                               : "HISTORICAL TRANSACTION REGISTRY",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: activeAccent,
+                            color: accentColor,
                             letterSpacing: 1.1,
                           ),
                         ),
@@ -89,7 +87,7 @@ class Analytics extends StatelessWidget {
                             AutoSizeText(
                               formattedDate,
                               maxLines: 1,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: mainText,
@@ -97,9 +95,9 @@ class Analytics extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             IconButton(
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.calendar_month_rounded,
-                                color: activeAccent,
+                                color: accentColor,
                                 size: 24,
                               ),
                               onPressed: () =>
@@ -118,9 +116,9 @@ class Analytics extends StatelessWidget {
                       padding: const EdgeInsets.all(12),
                     ),
                     onPressed: () => controller.triggerDailyReportPrint(),
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.print_rounded,
-                      color: isDark ? Colors.black : Colors.white,
+                      color: Colors.white,
                       size: 22,
                     ),
                   ),
@@ -137,11 +135,7 @@ class Analytics extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: surfaceColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF374151)
-                        : Colors.grey.shade200,
-                  ),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -154,14 +148,12 @@ class Analytics extends StatelessWidget {
                     Container(
                       width: 1,
                       height: 32,
-                      color: isDark
-                          ? const Color(0xFF374151)
-                          : Colors.grey.shade200,
+                      color: Colors.grey.shade200,
                     ),
                     _buildMetricsCell(
                       "TOTAL BILLS ISSUED",
                       "${controller.filteredTransactions.length}",
-                      activeAccent,
+                      const Color.fromARGB(255, 251, 157, 6),
                     ),
                   ],
                 ),
@@ -169,12 +161,12 @@ class Analytics extends StatelessWidget {
               const SizedBox(height: 20),
 
               // 3. EXPANDABLE TRANSACTION ITEMIZATION LOGS
-              Text(
+              const Text(
                 "TRANSACTION ITEMIZATION LOGS (TAP TO EXPAND)",
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: activeAccent,
+                  color: accentColor,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -189,18 +181,16 @@ class Analytics extends StatelessWidget {
                             Text(
                               "No transactions found for $formattedDate.",
                               style: TextStyle(
-                                color: isDark
-                                    ? Colors.white54
-                                    : Colors.grey.shade700,
+                                color: Colors.grey.shade300,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
+                            const Text(
                               "Tap the calendar icon above to check previous dates.",
                               style: TextStyle(
-                                color: isDark ? Colors.white38 : Colors.grey,
+                                color: Colors.grey,
                                 fontSize: 12,
                               ),
                             ),
@@ -214,7 +204,6 @@ class Analytics extends StatelessWidget {
                           final dynamic tx =
                               controller.filteredTransactions[index];
 
-                          // 100% Safe cast fallback to ensure map compliance
                           final Map<String, dynamic> safeTx = tx is Map
                               ? Map<String, dynamic>.from(tx)
                               : {};
@@ -226,14 +215,12 @@ class Analytics extends StatelessWidget {
                               ) ??
                               0.0;
 
-                          // --- CRITICAL FIX: Fully Guarded Data Map Extractor ---
                           final dynamic nestedData = safeTx['data'];
                           final Map<String, dynamic> targetDataSource =
                               (nestedData is Map)
                               ? Map<String, dynamic>.from(nestedData)
                               : safeTx;
 
-                          // Safely resolve variant lists or stringified arrays
                           dynamic rawItems =
                               targetDataSource['bills'] ??
                               targetDataSource['items'] ??
@@ -257,19 +244,13 @@ class Analytics extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: surfaceColor,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isDark
-                                      ? const Color(0xFF1F2937)
-                                      : Colors.grey.shade100,
-                                ),
+                                border: Border.all(color: Colors.grey.shade100),
                               ),
                               child: ExpansionTile(
                                 backgroundColor: Colors.transparent,
                                 collapsedBackgroundColor: Colors.transparent,
-                                iconColor: activeAccent,
-                                collapsedIconColor: isDark
-                                    ? Colors.white54
-                                    : Colors.grey.shade600,
+                                iconColor: priceColor,
+                                collapsedIconColor: mainText,
                                 tilePadding: const EdgeInsets.symmetric(
                                   horizontal: 14,
                                   vertical: 4,
@@ -282,16 +263,15 @@ class Analytics extends StatelessWidget {
                                 ),
                                 title: Text(
                                   "Bill No:$billNum",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
                                     color: mainText,
                                   ),
                                 ),
-
                                 trailing: Text(
                                   "₹${billAmt.toStringAsFixed(2)}",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: priceColor,
@@ -301,23 +281,21 @@ class Analytics extends StatelessWidget {
                                   const Divider(
                                     height: 16,
                                     thickness: 0.5,
-                                    color: Colors.grey,
+                                    color: Colors.white38,
                                   ),
+                                  // FIX 1: Clean item fallback logic replaces global loop bug
                                   if (itemsList.isEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(
                                         vertical: 8.0,
                                       ),
-                                      child: ListView.builder(
-                                        itemCount:
-                                            controller.allTransactions.length,
-                                        itemBuilder: (context, index) {
-                                          final itemname = controller
-                                              .allTransactions[index]['itemname'];
-                                          return Row(
-                                            children: [Text(itemname)],
-                                          );
-                                        },
+                                      child: Text(
+                                        "No item ledger records logged.",
+                                        style: TextStyle(
+                                          color: mainText,
+                                          fontSize: 13,
+                                          fontStyle: FontStyle.italic,
+                                        ),
                                       ),
                                     )
                                   else
@@ -368,20 +346,19 @@ class Analytics extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 "$name  x$qty",
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontSize: 13,
                                                   color: mainText,
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
+                                            // FIX 2: Swapped out dark grey color for high-visibility priceColor
                                             Text(
                                               "₹${totalItemAmt.toStringAsFixed(2)}",
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 13,
-                                                color: isDark
-                                                    ? Colors.white70
-                                                    : Colors.grey.shade800,
+                                                color: priceColor,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -410,9 +387,8 @@ class Analytics extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey,
+              fontSize: 15,
+              color: Color.fromARGB(255, 247, 244, 244),
               letterSpacing: 0.3,
             ),
           ),

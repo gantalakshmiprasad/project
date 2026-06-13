@@ -2,11 +2,10 @@
 
 import 'dart:ui';
 import 'package:firstproject/customs/customwidgets.dart';
-import 'package:firstproject/customs/uicustoms.dart';
-
 import 'package:firstproject/viewmodel/Authenticationctl/signupcontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class Signup extends StatelessWidget {
   const Signup({super.key});
@@ -14,85 +13,101 @@ class Signup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(Signupcontroller());
+
     return Scaffold(
+      backgroundColor: const Color(0xFF0B1517), // Match landing canvas base
       body: Container(
-        // Background Gradient
-        decoration: BoxDecoration(gradient: Appcolors().gradient1),
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0.6, 0.7),
+            radius: 1.3,
+            colors: [
+              Color(0x261E4D55), // Alpha hex opacity spotlight bloom
+              Color(0xFF0B1517),
+            ],
+            stops: [0.0, 1.0],
+          ),
+        ),
         child: Center(
           child: SizedBox(
-            width: 500,
+            width:
+                460, // Sized perfectly for desktop console proportion systems
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(24),
                 child: BackdropFilter(
-                  // This creates the "frosted" blur effect
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                   child: Container(
-                    width: double.infinity,
                     padding: const EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(47, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(30),
+                      color: const Color(
+                        0x0DFFFFFF,
+                      ), // 0.05 clean white glass transparency
+                      borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: const Color.fromARGB(33, 255, 255, 255),
+                        color: const Color(
+                          0x1AFFFFFF,
+                        ), // 0.1 border highlight line
                         width: 1.5,
                       ),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-
                       children: [
-                        // UBS Logo Circle
+                        // --- BRAND IDENTITY LOGO MODULE ---
                         Container(
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 12,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Text(
-                              'UBS',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
-                              ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0F262A),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(0xFF1E4D55),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: const Text(
+                            'UBS',
+                            style: TextStyle(
+                              color: Color(0xFF2DD4BF), // Unified theme teal
+                              fontSize: 32,
+                              letterSpacing: 2,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        // Brand Name
+                        const SizedBox(height: 16),
                         const Text(
                           'Universal Billing Service',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF94A3B8), // Sleek Slate text
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.3,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        // Email Field
+                        const SizedBox(height: 32),
+
+                        // --- INPUT FIELDS MODULE ---
                         Form(
                           key: controller.globalkey,
                           child: Column(
                             children: [
                               buildTextField(
-                                hint: 'username',
+                                hint: 'Username',
                                 controller: controller.usernamecontroller,
                               ),
-                              const SizedBox(height: 20),
-                              // Password Field
+                              const SizedBox(height: 18),
                               buildTextField(
-                                hint: 'Email',
-
+                                hint: 'Email Address',
                                 controller: controller.emailcontroller,
                               ),
-                              const SizedBox(height: 20),
-                              // Password Field
+                              const SizedBox(height: 18),
                               buildTextField(
                                 hint: 'Password',
                                 isPassword: true,
@@ -101,51 +116,107 @@ class Signup extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const SizedBox(height: 32),
 
-                        const SizedBox(height: 8),
-                        // Sign In Button
+                        // --- SIGN UP ACTION BUTTON WITH OVERLAY DISPATCH ---
                         SizedBox(
                           width: double.infinity,
-                          height: 55,
+                          height: 52,
                           child: ElevatedButton(
                             onPressed: () {
-                              controller.globalkey.currentState!.validate();
-                              controller.signup(
-                                controller.usernamecontroller.text.trim(),
-                                controller.emailcontroller.text.trim(),
-                                controller.passwordcontroller.text.trim(),
-                              );
+                              if (controller.globalkey.currentState
+                                      ?.validate() ??
+                                  false) {
+                                Get.showOverlay(
+                                  asyncFunction: () async {
+                                    try {
+                                      await controller.signup(
+                                        controller.usernamecontroller.text
+                                            .trim(),
+                                        controller.emailcontroller.text.trim(),
+                                        controller.passwordcontroller.text
+                                            .trim(),
+                                      );
+                                    } catch (e) {
+                                      // Graceful snackbar error reporting window
+                                      Get.snackbar(
+                                        'Registration Error',
+                                        e.toString().replaceAll(
+                                          'Exception: ',
+                                          '',
+                                        ),
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: const Color(
+                                          0xFF7F1D1D,
+                                        ), // Dark operational red
+                                        colorText: Colors.white,
+                                        borderRadius: 12,
+                                        margin: const EdgeInsets.all(16),
+                                        duration: const Duration(seconds: 4),
+                                      );
+                                    }
+                                  },
+                                  loadingWidget: Center(
+                                    child: Lottie.asset(
+                                      'assets/animations/loading.json',
+                                      width: 120,
+                                      height: 120,
+                                    ),
+                                  ),
+                                );
+                              }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Appcolors().buttoncolor,
+                              backgroundColor: const Color(
+                                0xFF2DD4BF,
+                              ), // Bright functional teal interaction layer
+                              foregroundColor: const Color(
+                                0xFF0B1517,
+                              ), // Rich high-contrast dark text
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               elevation: 0,
                             ),
                             child: const Text(
-                              'Sign Up',
+                              'Create System Account',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                         ),
+                        const SizedBox(height: 24),
+
+                        // --- SIGN IN ROUTING BLOCK ---
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               'Already have an account?',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 14,
+                              ),
                             ),
+                            const SizedBox(width: 4),
                             TextButton(
-                              onPressed: () {
-                                Get.offAllNamed('/login');
-                              },
-                              child: Text(
-                                'signin',
-                                style: TextStyle(color: Colors.white),
+                              onPressed: () => Get.offAllNamed(
+                                '/login',
+                              ), // Clear the routing stack history upon reversal
+                              style: TextButton.styleFrom(
+                                foregroundColor: const Color(0xFF2DD4BF),
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(0, 0),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                           ],

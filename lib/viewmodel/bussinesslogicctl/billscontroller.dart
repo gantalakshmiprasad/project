@@ -3,16 +3,16 @@ import 'package:appwrite/models.dart';
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/services/databaseservice.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Billscontroller extends GetxController {
-  final RxList bills = [].obs;
-  final RxBool isLoading = true.obs;
+  final RxList<Map<String, dynamic>> bills = <Map<String, dynamic>>[].obs;
+  final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
+
     fetchBills();
   }
 
@@ -26,19 +26,17 @@ class Billscontroller extends GetxController {
         [Query.equal('restaurantid', user.$id)],
       );
 
-      final RowList allBills = await Get.find<Databaseservice>().fetchdata(
-        ApiConfig().bill,
-        [
-          Query.equal('restaurantid', user.$id),
-          Query.orderAsc('billnumber'),
-          Query.limit(1000),
-        ], // Show latest bills first
-      );
+      final RowList allBills = await Get.find<Databaseservice>()
+          .fetchdata(ApiConfig().bill, [
+            Query.equal('restaurantid', user.$id),
+            Query.orderAsc('billnumber'),
+            Query.limit(1000),
+          ]);
 
-      final temporaryList = [];
+      final List<Map<String, dynamic>> temporaryList = [];
 
       for (var billRow in allBills.rows) {
-        final List billItems = [];
+        final List<Map<String, dynamic>> billItems = [];
 
         for (var itemRow in allItems.rows) {
           if (itemRow.data['billnumber'] == billRow.data['billnumber']) {
@@ -63,7 +61,7 @@ class Billscontroller extends GetxController {
 
       bills.assignAll(temporaryList);
     } catch (e) {
-      throw e.toString();
+      Get.snackbar("Error", "Failed to fetch bills: $e");
     } finally {
       isLoading.value = false;
     }
@@ -74,34 +72,31 @@ class Billscontroller extends GetxController {
     try {
       isLoading.value = true;
 
-      // 1. Create a "Batch" of deletions to avoid redundant fetching
-      // We loop through the bills list once.
       for (var bill in bills) {
-        // 2. Fetch only the items linked to THIS specific bill
-        final itemsToDelete = await dbservice.fetchdata(
-          ApiConfig().billeditems,
-          [Query.equal('restaurantid', bill['restaurantid'])],
-        );
+        // Fetch only items linked to THIS bill
+        final itemsToDelete = await dbservice
+            .fetchdata(ApiConfig().billeditems, [
+              Query.equal('restaurantid', bill['restaurantid']),
+              Query.equal('billnumber', bill['billnumber']),
+            ]);
 
-        // 3. Delete the children (items) first
         for (var row in itemsToDelete.rows) {
           await dbservice.deleteEntry(row.$id, ApiConfig().billeditems);
         }
 
-        // 4. Delete the parent (the bill itself)
         await dbservice.deleteEntry(bill['rowid'], ApiConfig().bill);
       }
 
-      // 5. Clear local state only after successful DB deletion
       bills.clear();
+
       Get.snackbar(
         "Success",
         "All records cleared from database.",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        backgroundColor: Get.theme.colorScheme.primary,
+        colorText: Get.theme.colorScheme.onPrimary,
       );
     } catch (e) {
-      Get.snackbar("Error", "Could not complete deletion.");
+      Get.snackbar("Error", "Could not complete deletion: $e");
     } finally {
       isLoading.value = false;
     }

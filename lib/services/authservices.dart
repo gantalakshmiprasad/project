@@ -38,14 +38,7 @@ class AuthServices extends GetxService {
 
       return true;
     } catch (e) {
-      throw Get.snackbar(
-        'Error',
-        'Invalid credentials',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        showProgressIndicator: true,
-        progressIndicatorBackgroundColor: Colors.red,
-      );
+      throw e.toString();
     }
   }
 

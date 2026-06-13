@@ -1,7 +1,6 @@
 import 'package:firstproject/customs/customwidgets.dart';
 import 'package:firstproject/view/bussinesslogic/billprintview.dart';
 import 'package:firstproject/view/bussinesslogic/print.dart';
-import 'package:firstproject/viewmodel/bussinesslogicctl/themecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,7 +10,6 @@ class Tablet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isdart = Get.find<ThemeController>();
     return Obx(
       () => Scaffold(
         backgroundColor: const Color(0xFF0B1517),
@@ -28,10 +26,26 @@ class Tablet extends StatelessWidget {
               Get.find<dynamic>().fetchBills();
             }
           },
+          selectedFontSize: 18,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Bills'),
-            BottomNavigationBarItem(icon: Icon(Icons.print), label: 'Print'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home, color: Color.fromARGB(255, 245, 243, 242)),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.history,
+                color: Color.fromARGB(255, 241, 240, 237),
+              ),
+              label: 'Bills',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.print,
+                color: Color.fromARGB(255, 252, 251, 250),
+              ),
+              label: 'Print',
+            ),
           ],
         ),
         body: () {
@@ -83,7 +97,6 @@ class Tablet extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item = controller.database[index];
                             return ItemCard(
-                              isdark: isdart.isDark,
                               key: ValueKey(item['id']),
                               itemName: item['data']['itemname'],
                               price: item['data']['itemprice'],

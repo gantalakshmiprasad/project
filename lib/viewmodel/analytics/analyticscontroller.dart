@@ -1,3 +1,5 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -51,9 +53,11 @@ class Analyticscontroller extends GetxController {
   Future<void> fetchTransactionsFromBackend() async {
     try {
       isLoading.value = true;
-
+      final user = await Get.find<AuthServices>().getaccount();
       String targetTableId = ApiConfig().bill;
-      RowList records = await _dbService.fetchdata(targetTableId, []);
+      RowList records = await _dbService.fetchdata(targetTableId, [
+        Query.equal('restaurantid', user.$id),
+      ]);
 
       List<Map<String, dynamic>> parsedRows = records.rows.map((row) {
         Map<String, dynamic> combinedMap = {};
