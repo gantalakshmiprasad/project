@@ -37,6 +37,49 @@ class Homepagecontroller extends GetxController {
   final TextEditingController namecontroller = TextEditingController();
   final TextEditingController pricecontroller = TextEditingController();
   //----------------------------------------------------------------------
+  var selectedCategory = 'Tiffins'.obs;
+  var selectedFilterCategory = 'All items'.obs;
+
+  // 2. Computed getter that filters the database reactively
+  List get filteredDatabase {
+    if (selectedFilterCategory.value == 'All items') {
+      return database;
+    }
+
+    return database.where((item) {
+      if (item['data'] == null) return false;
+
+      // 1. Fallback check: Look for 'category' or 'itemcategory' keys
+      final dynamic databaseCategory =
+          item['data']['category'] ?? item['data']['itemcategory'];
+
+      if (databaseCategory == null) {
+        // If this prints, your items in the database don't have a category field saved yet!
+        print(
+          "⚠️ Warning: Item ${item['data']['itemname']} has no category field in DB.",
+        );
+        return false;
+      }
+
+      // 2. Clean both strings (lowercase & remove spaces) to ensure a perfect match
+      String dbCategoryStr = databaseCategory.toString().trim().toLowerCase();
+      String filterCategoryStr = selectedFilterCategory.value
+          .trim()
+          .toLowerCase();
+
+      return dbCategoryStr == filterCategoryStr;
+    }).toList();
+  }
+
+  // Your exact item category list
+  final List<String> categories = [
+    'Tiffins',
+    'Non-veg Starter',
+    'Main Course',
+    'Veg-starters',
+    'Cool drinks',
+  ];
+  // Update your submit method to accept the category string
 
   @override
   void onInit() async {
@@ -50,7 +93,7 @@ class Homepagecontroller extends GetxController {
     try {
       isitemsloading.value = true;
       closedialog();
-
+      print(selectedCategory.value);
       final user = await authservice.getaccount(); //getting userid
       final fileid = await clicked(promptText); //getting fileid from function
       final image = await storageservice.getfile(fileid);
@@ -62,6 +105,7 @@ class Homepagecontroller extends GetxController {
         fileid: fileid,
         isavailable: true,
         quantity: 0,
+        category: selectedCategory.value,
       );
 
       await dbservice.createEntry(
@@ -297,40 +341,81 @@ class Homepagecontroller extends GetxController {
     try {
       isitemsloading.value = true;
 
-      // Create a list of delete futures
+      // Create a list of safe delete futures
       final deleteFutures = database.map((item) async {
+        // 1. Guard against missing or null item IDs
+        final String? itemId = item['id']?.toString();
+        if (itemId == null) {
+          print('Skipping item execution node: Missing valid database ID');
+          return null;
+        }
+
+        // Fetch entry tracking documents safely
         final data = await dbservice.getEntries(
-          item['id'],
+          itemId,
           ApiConfig().productmodel,
         );
-        final fileid = data['fileid'];
-        print(fileid);
-        await Get.find<Storageservice>().deletefile(
-          ApiConfig().bucketId,
-          item[fileid],
-        );
-        return dbservice.deleteEntry(item['id'], tableid);
+
+        // 2. Guard against completely null database response structures
+        if (data == null) {
+          print(
+            'Skipping storage sync: No schema payload found for ID $itemId',
+          );
+          await dbservice.deleteEntry(itemId, tableid);
+          return null;
+        }
+
+        // 3. Extract the file identifier key safely
+        final String? fileKey = data['fileid']?.toString();
+        print('Current processed file key pointer: $fileKey');
+
+        if (fileKey != null && item[fileKey] != null) {
+          final String actualFileId = item[fileKey].toString();
+
+          if (actualFileId.isNotEmpty) {
+            try {
+              // Execute file wipe out step inside a localized try-catch block
+              await Get.find<Storageservice>().deletefile(
+                ApiConfig().bucketId,
+                actualFileId,
+              );
+            } catch (storageErr) {
+              // Prevents a missing storage file from interrupting database drops
+              print(
+                'Storage file $actualFileId already purged or missing: $storageErr',
+              );
+            }
+          }
+        }
+
+        // Final clean wipe of the database record row entry
+        return dbservice.deleteEntry(itemId, tableid);
       }).toList();
 
-      // Wait for all deletions to complete in Appwrite
+      // Execute batch futures simultaneously in Appwrite engine
       await Future.wait(deleteFutures);
 
-      // Clear the local list and UI
+      // Clear local reactive memory data frames safely
       database.clear();
-      printcontroller.bills.clear(); // Also clear active bills
+
+      // 4. Double check printcontroller instance validity
+      // If printcontroller is an injected dependency, consider: Get.find<PrintController>().bills.clear();
+      printcontroller.bills.clear();
 
       Get.snackbar(
         'Success',
         'All items deleted successfully',
         backgroundColor: Colors.green,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Failed to delete items: ${e.toString()}',
+        'Failed to execute global purge command: ${e.toString()}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       isitemsloading.value = false;

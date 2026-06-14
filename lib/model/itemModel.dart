@@ -11,6 +11,7 @@ class Product {
   final String fileid;
   final bool isavailable;
   final int quantity;
+  final String category;
 
   Product({
     required this.id,
@@ -23,6 +24,7 @@ class Product {
     required this.fileid,
     this.isavailable = true,
     required this.quantity,
+    required this.category,
   });
 
   // Convert Product to Map (for Appwrite or JSON)
@@ -34,6 +36,7 @@ class Product {
       'fileid': fileid,
       'isavailable': isavailable,
       'quantity': quantity,
+      'category': category,
     };
   }
 
@@ -53,6 +56,7 @@ class Product {
       fileid: map['fileid'],
       isavailable: map['isavailable'] ?? true,
       quantity: map['quantity'],
+      category: map['category'],
     );
   }
 }

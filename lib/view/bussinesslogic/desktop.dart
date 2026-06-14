@@ -15,10 +15,11 @@ class Desktop extends StatelessWidget {
       appBar: appbar(controller),
       body: Row(
         children: [
-          // MAIN GRID CATALOGUE REGION
+          // --- MAIN GRID CATALOGUE REGION ---
           Expanded(
             flex: 3,
             child: Obx(() {
+              // 1. Process overall asynchronous initialization states first
               if (controller.isitemsloading.value) {
                 return Center(
                   child: Lottie.asset(
@@ -29,8 +30,12 @@ class Desktop extends StatelessWidget {
                 );
               }
 
-              if (controller.database.isEmpty) {
-                return const Center(
+              // 2. Assign conditional widgets into a local token parameter
+              // instead of triggering structural early returns.
+              Widget mainContent;
+
+              if (controller.filteredDatabase.isEmpty) {
+                mainContent = const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -51,66 +56,72 @@ class Desktop extends StatelessWidget {
                     ],
                   ),
                 );
+              } else {
+                mainContent = GridView.builder(
+                  padding: const EdgeInsets.all(24),
+                  itemCount: controller.filteredDatabase.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 6,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio:
+                        0.65, // Adjusts height-to-width ratio of slots
+                  ),
+                  itemBuilder: (context, index) {
+                    final item = controller.filteredDatabase[index];
+
+                    return ItemCard(
+                      key: ValueKey(item['id']),
+                      itemName: item['data']['itemname'],
+                      price: item['data']['itemprice'],
+                      available: item['data']['isavailable'],
+                      quantity: item['quantity'],
+                      imageurl: item['image'],
+                      decrease: () => controller.decreasequantity(item['id']),
+                      increase: () => controller.increasequantity(item['id']),
+                      onedit: () => controller.onedit(
+                        item['id'],
+                        item['data']['isavailable'],
+                        item['data']['itemname'],
+                      ),
+                      ondelete: () {
+                        _showDeleteItemConfirmation(context, controller, item);
+                      },
+                    );
+                  },
+                );
               }
 
+              // 3. Always return the root Stack layout so that the modal context tree
+              // renders smoothly over both operational workspace frames.
               return Stack(
                 alignment: Alignment.center,
                 children: [
-                  GridView.builder(
-                    padding: const EdgeInsets.all(24),
-                    itemCount: controller.database.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 220,
-                          childAspectRatio: 0.68,
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 20,
-                        ),
-                    itemBuilder: (context, index) {
-                      final item = controller.database[index];
-
-                      return ItemCard(
-                        key: ValueKey(item['id']),
-                        itemName: item['data']['itemname'],
-                        price: item['data']['itemprice'],
-                        available: item['data']['isavailable'],
-                        quantity: item['quantity'],
-                        imageurl: item['image'],
-                        decrease: () => controller.decreasequantity(item['id']),
-                        increase: () => controller.increasequantity(item['id']),
-                        onedit: () => controller.onedit(
-                          item['id'],
-                          item['data']['isavailable'],
-                          item['data']['itemname'],
-                        ),
-                        ondelete: () {
-                          _showDeleteItemConfirmation(
-                            context,
-                            controller,
-                            item,
-                          );
-                        },
-                      );
-                    },
-                  ),
+                  mainContent, // Holds either the empty state module or active catalog grid
 
                   if (controller.addclicked.value)
                     Container(
-                      color: Colors.black45,
-                      child: Center(
-                        child: SizedBox(
-                          height: 420,
-                          width: 500,
-                          child: itemform(controller),
-                        ),
+                      height: 450,
+                      width: 700,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: const Color.fromARGB(255, 252, 255, 253),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black,
+                            blurRadius: 30,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
+                      child: Center(child: itemform(controller)),
                     ),
                 ],
               );
             }),
           ),
 
-          // RIGHT SIDEBAR - BILL SUMMARY CHECKOUT PANEL
+          // --- RIGHT SIDEBAR - BILL SUMMARY CHECKOUT PANEL ---
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -133,6 +144,7 @@ class Desktop extends StatelessWidget {
     );
   }
 
+  // --- DELETE SYSTEM CONFIRMATION MODAL INTERFACES ---
   void _showDeleteItemConfirmation(
     BuildContext context,
     dynamic controller,

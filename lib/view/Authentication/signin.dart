@@ -103,14 +103,25 @@ class LoginScreen extends StatelessWidget {
                             children: [
                               buildTextField(
                                 hint: 'Email Address',
+
                                 controller: controller.emailcontroller,
                               ),
                               const SizedBox(height: 18),
-                              buildTextField(
-                                hint: 'Password',
-                                isPassword: true,
-                                controller: controller.passwordcontroller,
-                              ),
+                              Obx(() {
+                                final showpassword =
+                                    controller.showpassword.value;
+                                return buildTextField(
+                                  hint: 'Password',
+                                  isPassword: showpassword,
+
+                                  onSuffixPressed: () {
+                                    controller.showpassword.value =
+                                        !controller.showpassword.value;
+                                  },
+                                  passwordVisible: true,
+                                  controller: controller.passwordcontroller,
+                                );
+                              }),
                             ],
                           ),
                         ),
