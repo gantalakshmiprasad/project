@@ -1,13 +1,16 @@
 // ignore_for_file: unused_element
 
 import 'dart:async';
+import 'dart:convert'; // ✅ Added for base64 and json encoding
 import 'dart:developer';
 import 'dart:io';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; // 1. Added for cross-platform kIsWeb check
+import 'package:flutter/foundation.dart';
 import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart'
+    as http; // ✅ Added to communicate with the local agent
 
 class BluetoothPrinter {
   int? id;
@@ -62,21 +65,18 @@ class XPrinterController extends GetxController {
     super.onInit();
     portController.text = _port;
 
-    // Guard with !kIsWeb to ensure browser runtimes don't crash on boot
     if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
       defaultPrinterType.value = PrinterType.usb;
     }
 
     _initStatusStreams();
 
-    // Only scan if we are on a platform that supports native scanning
     if (!kIsWeb) {
       startScan();
     }
   }
 
   void _initStatusStreams() {
-    // If running on web, plugin streams cannot bind to native platform layers
     if (kIsWeb) return;
 
     _subscriptionBtStatus = printerManager.stateBluetooth.listen((status) {
@@ -85,7 +85,6 @@ class XPrinterController extends GetxController {
       isConnected.value = (status == BTStatus.connected);
 
       if (status == BTStatus.connected && pendingTask != null) {
-        // Keeps task queues functional when executing on mobile targets
         if (Platform.isAndroid || Platform.isIOS) {
           printerManager.send(type: PrinterType.bluetooth, bytes: pendingTask!);
           pendingTask = null;
@@ -130,12 +129,60 @@ class XPrinterController extends GetxController {
 
   /// Prints raw precompiled byte buffers returned from Appwrite functions
   Future<void> printRawBytes(List<int> rawBytes) async {
+    // ✅ NEW WEB HANDLING ROUTE
     if (kIsWeb) {
-      Get.snackbar(
-        'Web Mode',
-        'Direct hardware access is restricted within web browsers.',
+      log(
+        "📍 Running on Web Mode. Redirecting payload to local Print Agent...",
       );
-      return;
+      try {
+        // Fallback defaults if no printer configuration is mapped in the web UI yet
+        String printerTypeStr = 'usb';
+        String addressStr = '/dev/usb/lp0';
+
+        // If user picked a target layout in your web selection boxes, read them dynamically
+        if (selectedPrinter.value != null) {
+          final printer = selectedPrinter.value!;
+          addressStr = printer.address ?? addressStr;
+
+          if (printer.typePrinter == PrinterType.network) {
+            printerTypeStr = 'network';
+          } else if (printer.typePrinter == PrinterType.bluetooth) {
+            printerTypeStr = 'bluetooth';
+          }
+        }
+
+        // Convert the raw int list to web-safe base64 data strings
+        final String base64Payload = base64Encode(rawBytes);
+
+        final response = await http
+            .post(
+              Uri.parse('http://localhost:8080/print'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'bytes': base64Payload,
+                'printerType': printerTypeStr,
+                'address': addressStr,
+              }),
+            )
+            .timeout(const Duration(seconds: 4));
+
+        if (response.statusCode == 200) {
+          Get.snackbar('Success', 'Receipt printed successfully.');
+        } else {
+          Get.snackbar(
+            'Agent Error',
+            'Local print daemon failed processing payload.',
+          );
+        }
+      } catch (e) {
+        Get.snackbar(
+          'Agent Offline',
+          'Could not connect to the local printer. Make sure print_agent.dart is running locally.',
+          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.amber.shade100,
+        );
+      }
+      return; // Break execution sequence cleanly for web environments
     }
 
     // Linux Native Desktop Build Fallbacks
@@ -145,7 +192,6 @@ class XPrinterController extends GetxController {
         await _printToNetworkLinux(selectedPrinter.value!.address!, rawBytes);
         return;
       } else {
-        // Default direct file descriptor option for Linux local USB setups
         await _printToUsbLinux(rawBytes);
         return;
       }
