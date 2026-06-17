@@ -53,6 +53,7 @@ class CashfreeController extends GetxController {
                 'Sync Warning',
                 'Could not reach payment gateway. Showing offline status.',
                 snackPosition: SnackPosition.BOTTOM,
+                maxWidth: 400,
               );
             }
           } else {
@@ -61,7 +62,12 @@ class CashfreeController extends GetxController {
         }
       }
     } catch (e) {
-      Get.snackbar('Error', 'Initialization failed: $e');
+      Get.snackbar(
+        'Error',
+        'Initialization failed: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
+      );
     } finally {
       isloading.value = false;
     }
@@ -97,11 +103,18 @@ class CashfreeController extends GetxController {
         Get.snackbar(
           'Error',
           'Failed to generate session parameters from Cashfree.',
+          snackPosition: SnackPosition.BOTTOM,
+          maxWidth: 300,
         );
       }
     } catch (e) {
       isloading.value = false;
-      Get.snackbar('Error', 'Payment initialization failed: $e');
+      Get.snackbar(
+        'Error',
+        'Payment initialization failed: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
+      );
     }
   }
 
@@ -138,7 +151,12 @@ class CashfreeController extends GetxController {
         CFPaymentGatewayService().doPayment(payment);
       } catch (e) {
         isloading.value = false;
-        Get.snackbar("SDK Error", e.toString());
+        Get.snackbar(
+          "SDK Error",
+          e.toString(),
+          snackPosition: SnackPosition.BOTTOM,
+          maxWidth: 300,
+        );
       }
     }
   }

@@ -536,10 +536,10 @@ AppBar appbar(Homepagecontroller controller) {
   final List<String> filterCategories = [
     'All items',
     'Tiffins',
-    'Non-veg Starter',
+    'Non-veg ',
+    'Veg',
     'Main Course',
-    'Veg-starters',
-    'Cool drinks',
+    'Soft drinks',
   ];
 
   return AppBar(

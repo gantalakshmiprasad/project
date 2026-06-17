@@ -403,6 +403,30 @@ class PhysicalGetxCalendarPage extends StatelessWidget {
                   List billItemsList = billItem['items'] ?? [];
                   String createdat = billItem['createdAt'] ?? '';
 
+                  // 1. Parse the UTC string into a local machine DateTime object (automatically offsets +5:30 for India)
+                  DateTime localDateTime = DateTime.parse(createdat).toLocal();
+
+                  // 2. Extract Date Elements manually (Format: DD-MM-YYYY)
+                  String day = localDateTime.day.toString().padLeft(2, '0');
+                  String month = localDateTime.month.toString().padLeft(2, '0');
+                  int year = localDateTime.year;
+                  String formattedDate = "$day-$month-$year";
+
+                  // 3. Extract Time Elements manually (Format: 12-Hour AM/PM)
+                  int hour = localDateTime.hour;
+                  String period = hour >= 12 ? "PM" : "AM";
+                  hour = hour % 12;
+                  hour = hour == 0
+                      ? 12
+                      : hour; // Convert 0 to 12 for 12-hour format
+
+                  String minute = localDateTime.minute.toString().padLeft(
+                    2,
+                    '0',
+                  );
+                  String formattedTime =
+                      "${hour.toString().padLeft(2, '0')}:$minute $period";
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
@@ -414,7 +438,7 @@ class PhysicalGetxCalendarPage extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black,
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
@@ -446,7 +470,7 @@ class PhysicalGetxCalendarPage extends StatelessWidget {
                           ),
                         ),
                         title: Text(
-                          "Bill #$billNumber",
+                          "Bill No : $billNumber",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -455,13 +479,28 @@ class PhysicalGetxCalendarPage extends StatelessWidget {
                         ),
                         subtitle: Padding(
                           padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            "Timestamp: $createdat",
-                            style: const TextStyle(
-                              color: subText,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Row(
+                            children: [
+                              Text(
+                                "Date: $formattedDate",
+
+                                style: const TextStyle(
+                                  color: Color.fromARGB(255, 6, 7, 9),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(width: 15),
+                              Text(
+                                "Time: $formattedTime",
+
+                                style: const TextStyle(
+                                  color: Color.fromARGB(255, 6, 8, 10),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         trailing: Text(

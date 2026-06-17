@@ -74,10 +74,10 @@ class Homepagecontroller extends GetxController {
   // Your exact item category list
   final List<String> categories = [
     'Tiffins',
-    'Non-veg Starter',
+    'Non-veg',
+    'Veg',
     'Main Course',
-    'Veg-starters',
-    'Cool drinks',
+    'Soft drinks',
   ];
   // Update your submit method to accept the category string
 
@@ -128,6 +128,8 @@ class Homepagecontroller extends GetxController {
           "An item with the name '$promptText' already exists.",
           backgroundColor: Colors.red,
           colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          maxWidth: 300,
         );
       } else {
         Get.snackbar("Error", e.message ?? "An unknown error occurred");
@@ -142,7 +144,7 @@ class Homepagecontroller extends GetxController {
       final execution = await authservice.function.createExecution(
         functionId: ApiConfig().functionid,
         method: ExecutionMethod.pOST,
-        body: '{"prompt":"$promptText"}',
+        body: '{"action":"imagegeneration","prompt":"$promptText"}',
       );
       final Map<String, dynamic> image = jsonDecode(execution.responseBody);
       final urltobytes = await storageservice.urlToBytes(image['result']);
@@ -156,27 +158,6 @@ class Homepagecontroller extends GetxController {
 
   Future<void> onedit(String id, bool isavailable, String itemname) async {
     try {
-      Get.defaultDialog(
-        contentPadding: EdgeInsets.all(15),
-        title: isavailable ? 'Sold out' : 'Available',
-        content: isavailable
-            ? Stack(
-                children: [
-                  Text(
-                    '${itemname.toUpperCase()} is Sold out',
-                    style: TextStyle(fontSize: 30),
-                  ),
-                ],
-              )
-            : Text(
-                '${itemname.toUpperCase()} is available now',
-                style: TextStyle(fontSize: 30),
-              ),
-        titleStyle: TextStyle(color: Colors.black, fontSize: 30),
-        backgroundColor: isavailable ? Colors.red : Colors.green,
-        onCancel: () {},
-        cancelTextColor: Colors.black,
-      );
       for (var item in database) {
         if (item['id'] == id) {
           item['data']['isavailable'] = !isavailable;
@@ -184,6 +165,16 @@ class Homepagecontroller extends GetxController {
           break;
         }
       }
+      Get.snackbar(
+        isavailable ? 'Sold out' : 'Available',
+        isavailable
+            ? '${itemname.toUpperCase()} is Sold out'
+            : '${itemname.toUpperCase()} is available now',
+        backgroundColor: isavailable ? Colors.red : Colors.green,
+        maxWidth: 250,
+        duration: Duration(seconds: 2),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -328,6 +319,8 @@ class Homepagecontroller extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
         showProgressIndicator: true,
+        maxWidth: 250,
+        snackPosition: SnackPosition.BOTTOM,
       );
       refreshDatabase();
     } catch (e) {

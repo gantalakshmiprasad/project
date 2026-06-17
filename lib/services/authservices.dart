@@ -25,6 +25,8 @@ class AuthServices extends GetxService {
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
     }
   }
@@ -56,6 +58,8 @@ class AuthServices extends GetxService {
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
     }
   }
@@ -70,6 +74,8 @@ class AuthServices extends GetxService {
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
     }
   }
@@ -99,13 +105,20 @@ class AuthServices extends GetxService {
         email: email,
         url: 'http://localhost:3030/#/Resetpassword',
       );
-      Get.snackbar("Success", "Check your email for the reset link!");
+      Get.snackbar(
+        "Success",
+        "Check your email for the reset link!",
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
+      );
     } catch (e) {
       Get.snackbar(
         'Error',
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
     }
   }

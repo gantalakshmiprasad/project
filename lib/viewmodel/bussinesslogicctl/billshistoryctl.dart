@@ -126,9 +126,16 @@ class PhysicalCalendarController extends GetxController {
         "All records cleared from database.",
         backgroundColor: Colors.green,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
     } catch (e) {
-      Get.snackbar("Error", "Could not complete deletion.");
+      Get.snackbar(
+        "Error",
+        "Could not complete deletion.",
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
+      );
     } finally {
       Get.back();
     }

@@ -68,7 +68,7 @@ class Introductionpage extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            "v2.0 Cloud Engine Live",
+                            "v1.0 Cloud Engine Live",
                             style: TextStyle(
                               color: const Color(0xFF2DD4BF),
                               fontSize: isMobile ? 11 : 13,
@@ -102,7 +102,7 @@ class Introductionpage extends StatelessWidget {
                         maxWidth: isMobile ? double.infinity : 720,
                       ),
                       child: Text(
-                        'UBS strips away the complexity of traditional legacy POS setups. Experience a lightning-fast terminal built to effortlessly handle everything from busy restaurant kitchens to complex pharmacy batch distributions.',
+                        ' strips away the complexity of traditional legacy POS setups. Experience a lightning-fast terminal built to effortlessly handle everything from busy restaurant kitchens to complex pharmacy batch distributions.',
                         style: TextStyle(
                           color: const Color(
                             0xFF94A3B8,
@@ -184,7 +184,7 @@ class Introductionpage extends StatelessWidget {
               const Text(
                 'Universal Billing Service',
                 style: TextStyle(
-                  color: Color(0xFF64748B),
+                  color: Color.fromARGB(255, 244, 245, 246),
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -203,10 +203,7 @@ class Introductionpage extends StatelessWidget {
             ),
             child: const Text(
               'Sign In Workspace',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: Colors.white),
             ),
           ),
       ],
@@ -282,12 +279,6 @@ class Introductionpage extends StatelessWidget {
         'title': 'Smart Pharmacy',
         'desc':
             'Track expiry timelines, live item batch matrices, and medical compliance logs.',
-      },
-      {
-        'icon': Icons.cloud_done_rounded,
-        'title': 'Appwrite Engine Sync',
-        'desc':
-            'Instantaneous cloud transactions operating seamlessly even during intermittent offline modes.',
       },
     ];
 

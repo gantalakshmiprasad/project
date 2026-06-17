@@ -39,11 +39,8 @@ dependencies:
   http: ^1.6.0
   appwrite: ^22.0.0
   auto_size_text: ^3.0.0
-  google_fonts: ^8.0.2
-  pos_printer_d: ^1.0.3
+  google_fonts: ^8.0.2  
   intl: ^0.20.2
-  esc_pos_utils: ^1.1.0
-  
   crypto: ^3.0.2  
   flutter_cashfree_pg_sdk: ^2.3.4+51
   url_launcher: ^6.3.2
@@ -51,6 +48,9 @@ dependencies:
   google_generative_ai: ^0.4.7
   font_awesome_flutter: ^11.0.0
   table_calendar: ^3.2.0
+  esc_pos_utils: ^1.1.0
+  flutter_pos_printer_platform_image_3: ^1.2.4
+
 
 
  

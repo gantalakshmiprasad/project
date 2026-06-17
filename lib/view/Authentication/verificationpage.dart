@@ -149,7 +149,7 @@ class Verificationpage extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0x102DD4BF), // Clean subtle translucent teal layer
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: tealAccent.withOpacity(0.25), width: 1.2),
+        border: Border.all(color: tealAccent, width: 1.2),
       ),
       child: Column(
         children: [
@@ -204,7 +204,7 @@ class Verificationpage extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0x10FB7185), // Clean subtle translucent red layer
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: errorRed.withOpacity(0.25), width: 1.2),
+        border: Border.all(color: errorRed, width: 1.2),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

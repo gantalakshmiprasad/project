@@ -57,6 +57,8 @@ class Databaseservice extends GetxService {
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
       return null;
     }
@@ -82,6 +84,8 @@ class Databaseservice extends GetxService {
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
       return null;
     }
@@ -102,6 +106,8 @@ class Databaseservice extends GetxService {
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        maxWidth: 300,
       );
       return false;
     }
