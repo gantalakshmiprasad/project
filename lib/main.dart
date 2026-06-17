@@ -54,7 +54,7 @@ void main() async {
   // 4. STEP 2: Register lazy controllers safely
   Get.lazyPut(() => Paymentstatuscontroller());
   Get.lazyPut(() => Homepagecontroller());
-  Get.put(XPrinterController());
+  //Get.put(XPrinterController());
   // 5. STEP 3: Initialize user details controller
   // Now this can safely run Get.find<AuthServices>() inside its onInit() hook!
 

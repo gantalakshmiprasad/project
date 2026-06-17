@@ -2,15 +2,17 @@
 
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/enums.dart';
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
+
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/printreceipt.dart';
+
 import 'package:get/get.dart';
-// Import your layout controller file path containing XPrinterController here
 
 class Printcontroller extends GetxController {
   final RxString bussinesstitle = ''.obs;
@@ -21,7 +23,7 @@ class Printcontroller extends GetxController {
   final Databaseservice database = Get.find<Databaseservice>();
   final RxBool isloading = false.obs;
   final RxInt token = 1.obs;
-
+  final XPrinterController printreceipt = Get.put(XPrinterController());
   double get totalAmount => bills.fold(
     0.0,
     (sum, item) =>
@@ -38,171 +40,127 @@ class Printcontroller extends GetxController {
     super.onInit();
     try {
       final user = await Get.find<AuthServices>().getaccount();
-
+      print('This is from printfile:${user.$id}');
       final result = await database.fetchdata(ApiConfig().bill, [
+        // Filter by user
         Query.equal('restaurantid', user.$id),
         Query.orderDesc('billnumber'),
-        Query.limit(1),
+        // Sort highest to lowest
+        Query.limit(1), // Only take the top one
       ]);
-
       final bussinessinfo = await database.getEntries(
         user.$id,
         ApiConfig().profile,
       );
-      bussinesstitle.value = bussinessinfo['bussinessname'] ?? '';
-      address.value = bussinessinfo['address'] ?? '';
-
+      bussinesstitle.value = bussinessinfo['bussinessname'];
+      address.value = bussinessinfo['address'];
       if (result.rows.isNotEmpty) {
+        // Get the highest number and add 1
         int lastBill = result.rows.first.data['billnumber'];
         billno.value = lastBill + 1;
       } else {
-        billno.value = 1;
+        billno.value = 1; // Start at 1 if no bills exist
       }
     } catch (e) {
-      throw e.toString();
+      print(e.toString());
     }
   }
 
   Future<void> printReceipt() async {
     final homepagectl = Get.find<Homepagecontroller>();
 
-    print("📍 [DEBUG] 1. entering printReceipt function");
-
-    // Check if XPrinterController is even registered in GetX memory
-    if (!Get.isRegistered<XPrinterController>()) {
-      print(
-        "❌ [DEBUG] ERROR: XPrinterController is NOT found in GetX memory! Did you call Get.put(XPrinterController())?",
-      );
-      Get.snackbar('System Error', 'Printer service not initialized.');
-      return;
-    }
-    final XPrinterController printerController = Get.find<XPrinterController>();
-
-    if (bills.isEmpty) {
-      print("❌ [DEBUG] Early exit: 'bills' list is empty. Nothing to print.");
-      return;
-    }
+    if (bills.isEmpty) return;
 
     try {
       isloading.value = true;
       final currentBillNo = billno.value;
-      final currentTotal = int.tryParse(totalAmount.toString()) ?? 0;
+      final currentTotal = int.tryParse(totalAmount.toString());
       final itemsToSave = List.from(bills);
 
-      print(
-        "📍 [DEBUG] 2. Bills count: ${itemsToSave.length}, Total: $currentTotal",
-      );
-
       final user = await Get.find<AuthServices>().getaccount();
-
       final data1 = {
         'billnumber': currentBillNo,
         'totalamount': currentTotal,
         'restaurantid': user.$id,
       };
 
-      print("📍 [DEBUG] 3. Saving main bill to Appwrite Database...");
-      await database.createEntry(ID.unique(), data1, ApiConfig().bill);
-      print("✅ [DEBUG] Main bill saved successfully.");
+      final receipt = {
+        "billId": currentBillNo,
+        "items": itemsToSave,
+        "total": currentTotal,
+      };
 
-      print("📍 [DEBUG] 4. Saving itemized billed items...");
+      await database.createEntry(ID.unique(), data1, ApiConfig().bill);
+
       for (var item in itemsToSave) {
         final data = {
           'billnumber': currentBillNo,
           'itemname': item['itemname'],
-          'itemprice': int.tryParse(item['itemprice'].toString()) ?? 0,
-          'quantity': int.tryParse(item['quantity'].toString()) ?? 0,
+          'itemprice': int.tryParse(item['itemprice'].toString()),
+          'quantity': int.tryParse(item['quantity'].toString()),
           'restaurantid': user.$id,
         };
+
         await database.createEntry(ID.unique(), data, ApiConfig().billeditems);
       }
-      print("✅ [DEBUG] Itemized items saved successfully.");
 
-      // Local State Cleanup
-      checkoutHistory.add({
-        "billId": currentBillNo,
-        "items": itemsToSave,
-        "total": currentTotal,
-      });
+      // 4. UI/Local State Cleanup
+      checkoutHistory.add(receipt);
       bills.clear();
       billno.value++;
-
-      print(
-        "📍 [DEBUG] 5. Calling Appwrite Cloud Function (${ApiConfig().functionid})...",
-      );
 
       final execution = await Get.find<AuthServices>().function.createExecution(
         functionId: ApiConfig().functionid,
         method: ExecutionMethod.pOST,
         body: jsonEncode({
           "action": "printreceipt",
-          "storeName": bussinesstitle.value.isEmpty
-              ? "UNIVERSAL BILLING"
-              : bussinesstitle.value,
-          "invoiceId": "INV-${currentBillNo.toString().padLeft(4, '0')}",
-          "date": "2026-06-17 10:50",
-          "items": itemsToSave
-              .map(
-                (e) => {
-                  "name": e['itemname'],
-                  "qty": e['quantity'],
-                  "price": double.tryParse(e['itemprice'].toString()) ?? 0.0,
-                },
-              )
-              .toList(),
-          "total": currentTotal.toDouble(),
+          "storeName": "UNIVERSAL BILLING",
+          "invoiceId": "INV-2026-0042",
+          "date": "2026-06-17 10:45",
+          "printerWidth": 58,
+          "items": [
+            {"name": "Tomato", "qty": 2, "price": 30.00},
+            {"name": "Rice 5kg", "qty": 1, "price": 350.00},
+            {"name": "Santoor Soap 150g", "qty": 3, "price": 45.00},
+          ],
+          "total": 545.00,
         }),
       );
 
-      print(
-        "✅ [DEBUG] Appwrite Function executed. Status Code: ${execution.status}",
-      );
-      print("📍 [DEBUG] Appwrite Raw Response Body: ${execution.responseBody}");
-
-      // Clear quantities UI
       for (var item in homepagectl.database) {
         item['quantity'] = 0;
       }
       homepagectl.database.refresh();
       token.value++;
-
-      // Process Response
       final responseData = jsonDecode(execution.responseBody);
 
       if (responseData['success'] == true) {
+        // 2. Extract the string (This is where the raw "G0AbYQEb..." string lives)
         String? base64BytesStr = responseData['bytes'];
+
         if (base64BytesStr == null || base64BytesStr.isEmpty) {
-          print(
-            "❌ [DEBUG] ERROR: 'bytes' key in Appwrite response is null or empty!",
-          );
+          print("❌ Error: 'bytes' field is empty or missing from response.");
           return;
         }
 
-        print("📍 [DEBUG] 6. Decoding Base64 receipt bytes...");
-        Uint8List rawPrinterBytes = base64Decode(base64BytesStr);
-        print(
-          "✅ [DEBUG] Successfully decoded ${rawPrinterBytes.length} bytes.",
-        );
+        print("📍 Decoding Base64 receipt string into byte array...");
 
-        print("📍 [DEBUG] 7. Sending bytes directly to printer controller...");
-        await printerController.printRawBytes(rawPrinterBytes);
-        print("✅ [DEBUG] Direct stream command completed.");
-      } else {
-        print(
-          "❌ [DEBUG] Appwrite function returned success: false. Message: ${responseData['message']}",
-        );
-        Get.snackbar(
-          'Execution Error',
-          responseData['message'] ?? 'Failed compiling layout.',
-        );
+        // ✅ THE CRITICAL FIX: Convert the String into a List<int> (Uint8List)
+        Uint8List rawPrinterBytes = base64Decode(base64BytesStr);
+
+        print("✅ Successfully decoded ${rawPrinterBytes.length} bytes.");
+
+        print("📍 Sending decoded byte array directly to printer...");
+
+        // 3. Pass the decoded List<int> to your printer controller
+        await printreceipt.printRawBytes(rawPrinterBytes);
       }
-    } catch (e, stacktrace) {
-      print("❌ [DEBUG] CRITICAL CRASH inside printReceipt: $e");
-      print("📍 [DEBUG] Stacktrace: $stacktrace");
-      Get.snackbar('Transaction Error', 'Failed execution loop: $e');
+    } catch (e) {
+      print("Error saving receipt: $e");
+
+      // Consider using Get.snackbar here to inform the user
     } finally {
       isloading.value = false;
-      print("📍 [DEBUG] 8. Exiting printReceipt function execution loop.");
     }
   }
 }

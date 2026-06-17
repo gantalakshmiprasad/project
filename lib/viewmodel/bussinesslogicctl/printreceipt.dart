@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // 1. Added for cross-platform kIsWeb check
 import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +34,7 @@ class BluetoothPrinter {
 }
 
 class XPrinterController extends GetxController {
-  final printerManager = PrinterManager.instance;
+  PrinterManager get printerManager => PrinterManager.instance;
 
   StreamSubscription<PrinterDevice>? _subscription;
   StreamSubscription<BTStatus>? _subscriptionBtStatus;
@@ -42,7 +43,7 @@ class XPrinterController extends GetxController {
   final ipController = TextEditingController();
   final portController = TextEditingController();
 
-  final defaultPrinterType = PrinterType.bluetooth.obs;
+  final defaultPrinterType = PrinterType.usb.obs;
   final isBle = false.obs;
   final reconnect = false.obs;
   final isConnected = false.obs;
@@ -61,21 +62,30 @@ class XPrinterController extends GetxController {
     super.onInit();
     portController.text = _port;
 
-    if (Platform.isWindows || Platform.isLinux) {
+    // Guard with !kIsWeb to ensure browser runtimes don't crash on boot
+    if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
       defaultPrinterType.value = PrinterType.usb;
     }
 
     _initStatusStreams();
-    startScan();
+
+    // Only scan if we are on a platform that supports native scanning
+    if (!kIsWeb) {
+      startScan();
+    }
   }
 
   void _initStatusStreams() {
+    // If running on web, plugin streams cannot bind to native platform layers
+    if (kIsWeb) return;
+
     _subscriptionBtStatus = printerManager.stateBluetooth.listen((status) {
       log(' ----------------- status bt $status ------------------ ');
       _currentStatus.value = status;
       isConnected.value = (status == BTStatus.connected);
 
       if (status == BTStatus.connected && pendingTask != null) {
+        // Keeps task queues functional when executing on mobile targets
         if (Platform.isAndroid || Platform.isIOS) {
           printerManager.send(type: PrinterType.bluetooth, bytes: pendingTask!);
           pendingTask = null;
@@ -87,16 +97,18 @@ class XPrinterController extends GetxController {
       log(' ----------------- status usb $status ------------------ ');
       _currentUsbStatus.value = status;
 
-      if (Platform.isAndroid &&
-          status == USBStatus.connected &&
-          pendingTask != null) {
-        printerManager.send(type: PrinterType.usb, bytes: pendingTask!);
-        pendingTask = null;
+      if (status == USBStatus.connected && pendingTask != null) {
+        if (Platform.isAndroid) {
+          printerManager.send(type: PrinterType.usb, bytes: pendingTask!);
+          pendingTask = null;
+        }
       }
     });
   }
 
   void startScan() {
+    if (kIsWeb) return;
+
     devices.clear();
     _subscription?.cancel();
 
@@ -118,20 +130,28 @@ class XPrinterController extends GetxController {
 
   /// Prints raw precompiled byte buffers returned from Appwrite functions
   Future<void> printRawBytes(List<int> rawBytes) async {
-    // Linux Native Execution Mode Direct Path Fallbacks
+    if (kIsWeb) {
+      Get.snackbar(
+        'Web Mode',
+        'Direct hardware access is restricted within web browsers.',
+      );
+      return;
+    }
+
+    // Linux Native Desktop Build Fallbacks
     if (Platform.isLinux) {
       if (selectedPrinter.value?.typePrinter == PrinterType.network &&
           selectedPrinter.value?.address != null) {
         await _printToNetworkLinux(selectedPrinter.value!.address!, rawBytes);
         return;
       } else {
-        // Defaults to USB file system channel manipulation node
+        // Default direct file descriptor option for Linux local USB setups
         await _printToUsbLinux(rawBytes);
         return;
       }
     }
 
-    // Cross-Platform Mobile Fallbacks
+    // Cross-Platform Mobile Fallbacks (Android/iOS)
     if (selectedPrinter.value == null) {
       Get.snackbar(
         'Printer Error',
@@ -209,14 +229,14 @@ class XPrinterController extends GetxController {
     selectedPrinter.value = null;
     isBle.value = false;
     isConnected.value = false;
-    startScan();
+    if (!kIsWeb) startScan();
   }
 
   void toggleBle(bool value) {
     isBle.value = value;
     isConnected.value = false;
     selectedPrinter.value = null;
-    startScan();
+    if (!kIsWeb) startScan();
   }
 
   void setIpAddress(String value) {
@@ -245,6 +265,7 @@ class XPrinterController extends GetxController {
   }
 
   void selectDevice(BluetoothPrinter device) async {
+    if (kIsWeb) return;
     if (selectedPrinter.value != null) {
       if ((device.address != selectedPrinter.value!.address) ||
           (device.typePrinter == PrinterType.usb &&
@@ -258,7 +279,7 @@ class XPrinterController extends GetxController {
   }
 
   Future<void> connectDevice() async {
-    if (selectedPrinter.value == null) return;
+    if (kIsWeb || selectedPrinter.value == null) return;
     final printer = selectedPrinter.value!;
 
     switch (printer.typePrinter) {
@@ -295,14 +316,14 @@ class XPrinterController extends GetxController {
   }
 
   Future<void> disconnectDevice() async {
-    if (selectedPrinter.value != null) {
+    if (!kIsWeb && selectedPrinter.value != null) {
       await printerManager.disconnect(type: selectedPrinter.value!.typePrinter);
     }
     isConnected.value = false;
   }
 
   void _executePrintBytes(List<int> bytes, Generator generator) async {
-    if (selectedPrinter.value == null) return;
+    if (kIsWeb || selectedPrinter.value == null) return;
     final printer = selectedPrinter.value!;
 
     bytes += generator.feed(2);
