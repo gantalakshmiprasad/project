@@ -100,11 +100,9 @@ class Printcontroller extends GetxController {
           'quantity': int.tryParse(item['quantity'].toString()),
           'restaurantid': user.$id,
         };
-
         await database.createEntry(ID.unique(), data, ApiConfig().billeditems);
       }
 
-      // 4. UI/Local State Cleanup
       checkoutHistory.add(receipt);
       bills.clear();
       billno.value++;
@@ -114,16 +112,12 @@ class Printcontroller extends GetxController {
         method: ExecutionMethod.pOST,
         body: jsonEncode({
           "action": "printreceipt",
-          "storeName": "UNIVERSAL BILLING",
-          "invoiceId": "INV-2026-0042",
-          "date": "2026-06-17 10:45",
+          "storeName": bussinesstitle.value,
+          "invoiceId": "INV-$currentBillNo",
+          "date": DateTime.now().toString(),
           "printerWidth": 58,
-          "items": [
-            {"name": "Tomato", "qty": 2, "price": 30.00},
-            {"name": "Rice 5kg", "qty": 1, "price": 350.00},
-            {"name": "Santoor Soap 150g", "qty": 3, "price": 45.00},
-          ],
-          "total": 545.00,
+          "items": itemsToSave,
+          "total": currentTotal,
         }),
       );
 
@@ -132,23 +126,19 @@ class Printcontroller extends GetxController {
       }
       homepagectl.database.refresh();
       token.value++;
+
       final responseData = jsonDecode(execution.responseBody);
 
       if (responseData['success'] == true) {
-        // 2. Extract the string (This is where the raw "G0AbYQEb..." string lives)
         String? base64BytesStr = responseData['bytes'];
-
         if (base64BytesStr != null && base64BytesStr.isNotEmpty) {
           Uint8List receiptBytes = base64Decode(base64BytesStr);
-
           final printerService = UsbPrinterService();
           await printerService.printReceipt(receiptBytes);
         }
       }
     } catch (e) {
       print("Error saving receipt: $e");
-
-      // Consider using Get.snackbar here to inform the user
     } finally {
       isloading.value = false;
     }
