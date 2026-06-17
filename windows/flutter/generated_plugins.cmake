@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
-  flutter_pos_printer_platform_image_3
   url_launcher_windows
   window_to_front
 )

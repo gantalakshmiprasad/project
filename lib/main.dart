@@ -17,7 +17,6 @@ import 'package:firstproject/view/bussinesslogic/paymentstatus.dart';
 import 'package:firstproject/view/bussinesslogic/print.dart';
 import 'package:firstproject/view/bussinesslogic/profilepage.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
-import 'package:firstproject/viewmodel/bussinesslogicctl/printreceipt.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'customs/config.dart';

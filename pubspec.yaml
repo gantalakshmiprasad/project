@@ -48,10 +48,8 @@ dependencies:
   google_generative_ai: ^0.4.7
   font_awesome_flutter: ^11.0.0
   table_calendar: ^3.2.0
-  esc_pos_utils: ^1.1.0
-  flutter_pos_printer_platform_image_3: ^1.2.4
-
-
+  web: ^1.1.1
+  usb_device: ^1.0.2
 
  
 dev_dependencies:

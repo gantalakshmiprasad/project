@@ -17,14 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.6.1"
-  args:
-    dependency: transitive
-    description:
-      name: args
-      sha256: d0481093c50b1da8910eb0bb301626d4d8eb7284aa739614d2b394ee09e3ea04
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.0"
   async:
     dependency: transitive
     description:
@@ -97,14 +89,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.7"
-  csslib:
-    dependency: transitive
-    description:
-      name: csslib
-      sha256: "09bad715f418841f976c77db72d5398dc1253c21fb9c0c7f0b0b985860b2d58e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.2"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -113,14 +97,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
-  dbus:
-    dependency: transitive
-    description:
-      name: dbus
-      sha256: "0ce9b0a839e6dee59a37a623d2fc26a35bbbe6404213e419b0d6411023d62645"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.14"
   desktop_webview_window:
     dependency: transitive
     description:
@@ -145,22 +121,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.3"
-  enum_to_string:
-    dependency: transitive
-    description:
-      name: enum_to_string
-      sha256: "93b75963d3b0c9f6a90c095b3af153e1feccb79f6f08282d3274ff8d9eea52bc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.1"
-  esc_pos_utils:
-    dependency: "direct main"
-    description:
-      name: esc_pos_utils
-      sha256: "8ec0013d7a7f1e790ced6b09b95ce3bf2c6f9468a3e2bc49ece000761d86c6f8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -206,14 +166,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_pos_printer_platform_image_3:
-    dependency: "direct main"
-    description:
-      name: flutter_pos_printer_platform_image_3
-      sha256: "23836dbdd0eee27d61c4e0e0d426496f7a78ddbf53df9966476987143e2be442"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -248,14 +200,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "11.0.0"
-  gbk_codec:
-    dependency: transitive
-    description:
-      name: gbk_codec
-      sha256: "3af5311fc9393115e3650ae6023862adf998051a804a08fb804f042724999f61"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.0"
   get:
     dependency: "direct main"
     description:
@@ -288,14 +232,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.7"
-  hex:
-    dependency: transitive
-    description:
-      name: hex
-      sha256: "4e7cd54e4b59ba026432a6be2dd9d96e4c5205725194997193bf871703b82c4a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
   hooks:
     dependency: transitive
     description:
@@ -304,14 +240,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-  html:
-    dependency: transitive
-    description:
-      name: html
-      sha256: "6d1264f2dffa1b1101c25a91dff0dc2daee4c18e87cd8538729773c073dbf602"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.15.6"
   http:
     dependency: "direct main"
     description:
@@ -328,22 +256,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
-  image:
-    dependency: transitive
-    description:
-      name: image
-      sha256: "8e9d133755c3e84c73288363e6343157c383a0c6c56fc51afcc5d4d7180306d6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.0"
-  image_v3:
-    dependency: transitive
-    description:
-      name: image_v3
-      sha256: dd9f790f2397dd243a74e606a57780e03e2fb67f372baf587e7780c37bd0258d
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.0"
   intl:
     dependency: "direct main"
     description:
@@ -440,30 +352,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.17.5"
-  network_info_plus:
-    dependency: transitive
-    description:
-      name: network_info_plus
-      sha256: "4601b815b1c6a46d84839f65cd774a7d999738471d910fae00d813e9e98b04e1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0+1"
-  network_info_plus_platform_interface:
-    dependency: transitive
-    description:
-      name: network_info_plus_platform_interface
-      sha256: "881f5029c5edaf19c616c201d3d8b366c5b1384afd5c1da5a49e4345de82fb8b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.3"
-  nm:
-    dependency: transitive
-    description:
-      name: nm
-      sha256: "2c9aae4127bdc8993206464fcc063611e0e36e72018696cd9631023a31b24254"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
   objective_c:
     dependency: transitive
     description:
@@ -544,22 +432,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  petitparser:
-    dependency: transitive
-    description:
-      name: petitparser
-      sha256: "91bd59303e9f769f108f8df05e371341b15d59e995e6806aefab827b58336675"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.0.2"
-  ping_discover_network_forked:
-    dependency: transitive
-    description:
-      name: ping_discover_network_forked
-      sha256: d3975c4f3fbaa388f78fb4037ad9c33059d8e2ec0e804ed45e05277d2451fe77
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
   platform:
     dependency: transitive
     description:
@@ -584,14 +456,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  rxdart:
-    dependency: transitive
-    description:
-      name: rxdart
-      sha256: "0c7c0cedd93788d996e33041ffecda924cc54389199cde4e6a34b440f50044cb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.27.7"
   simple_gesture_detector:
     dependency: transitive
     description:
@@ -741,6 +605,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.5"
+  usb_device:
+    dependency: "direct main"
+    description:
+      name: usb_device
+      sha256: ac37b62070c43c40968052f1d6e96470aad840d939cc611a3507e29f230b9354
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
+  usb_device_platform_interface:
+    dependency: transitive
+    description:
+      name: usb_device_platform_interface
+      sha256: f289c75091376462b563fd94b74f60aa6447e6429a5a88bd70effc35c39c9570
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  usb_device_web:
+    dependency: transitive
+    description:
+      name: usb_device_web
+      sha256: "1a83133fa5a70ae8bd3cd1886579c322748d5c9765e61a2c1597353b21b082fc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   vector_math:
     dependency: transitive
     description:
@@ -758,7 +646,7 @@ packages:
     source: hosted
     version: "15.0.2"
   web:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: web
       sha256: "868d88a33d8a87b18ffc05f9f030ba328ffefba92d6c127917a2ba740f9cfe4a"
@@ -813,14 +701,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  xml:
-    dependency: transitive
-    description:
-      name: xml
-      sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.6.1"
   yaml:
     dependency: transitive
     description:

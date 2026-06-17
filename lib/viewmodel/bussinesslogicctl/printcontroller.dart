@@ -23,7 +23,7 @@ class Printcontroller extends GetxController {
   final Databaseservice database = Get.find<Databaseservice>();
   final RxBool isloading = false.obs;
   final RxInt token = 1.obs;
-  final XPrinterController printreceipt = Get.put(XPrinterController());
+
   double get totalAmount => bills.fold(
     0.0,
     (sum, item) =>
@@ -138,22 +138,12 @@ class Printcontroller extends GetxController {
         // 2. Extract the string (This is where the raw "G0AbYQEb..." string lives)
         String? base64BytesStr = responseData['bytes'];
 
-        if (base64BytesStr == null || base64BytesStr.isEmpty) {
-          print("❌ Error: 'bytes' field is empty or missing from response.");
-          return;
+        if (base64BytesStr != null && base64BytesStr.isNotEmpty) {
+          Uint8List receiptBytes = base64Decode(base64BytesStr);
+
+          final printerService = UsbPrinterService();
+          await printerService.printReceipt(receiptBytes);
         }
-
-        print("📍 Decoding Base64 receipt string into byte array...");
-
-        // ✅ THE CRITICAL FIX: Convert the String into a List<int> (Uint8List)
-        Uint8List rawPrinterBytes = base64Decode(base64BytesStr);
-
-        print("✅ Successfully decoded ${rawPrinterBytes.length} bytes.");
-
-        print("📍 Sending decoded byte array directly to printer...");
-
-        // 3. Pass the decoded List<int> to your printer controller
-        await printreceipt.printRawBytes(rawPrinterBytes);
       }
     } catch (e) {
       print("Error saving receipt: $e");
