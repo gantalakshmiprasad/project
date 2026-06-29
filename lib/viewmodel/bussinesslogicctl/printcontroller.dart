@@ -1,17 +1,11 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/enums.dart';
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
-
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
-import 'package:firstproject/viewmodel/bussinesslogicctl/printreceipt.dart';
-
+import 'package:firstproject/viewmodel/connectionctl/bluetoothctl.dart';
 import 'package:get/get.dart';
 
 class Printcontroller extends GetxController {
@@ -68,11 +62,11 @@ class Printcontroller extends GetxController {
 
   Future<void> printReceipt() async {
     final homepagectl = Get.find<Homepagecontroller>();
-
+    final printcontroller = Get.put(BluetoothController());
     if (bills.isEmpty) return;
 
     try {
-      isloading.value = true;
+      /*   isloading.value = true;
       final currentBillNo = billno.value;
       final currentTotal = int.tryParse(totalAmount.toString());
       final itemsToSave = List.from(bills);
@@ -105,9 +99,9 @@ class Printcontroller extends GetxController {
 
       checkoutHistory.add(receipt);
       bills.clear();
-      billno.value++;
+      billno.value++; */
 
-      final execution = await Get.find<AuthServices>().function.createExecution(
+      /* final execution = await Get.find<AuthServices>().function.createExecution(
         functionId: ApiConfig().functionid,
         method: ExecutionMethod.pOST,
         body: jsonEncode({
@@ -119,24 +113,14 @@ class Printcontroller extends GetxController {
           "items": itemsToSave,
           "total": currentTotal,
         }),
-      );
-
+      ); */
+      /* 
       for (var item in homepagectl.database) {
         item['quantity'] = 0;
       }
       homepagectl.database.refresh();
-      token.value++;
-
-      final responseData = jsonDecode(execution.responseBody);
-
-      if (responseData['success'] == true) {
-        String? base64BytesStr = responseData['bytes'];
-        if (base64BytesStr != null && base64BytesStr.isNotEmpty) {
-          Uint8List receiptBytes = base64Decode(base64BytesStr);
-          final printerService = UsbPrinterService();
-          await printerService.printReceipt(receiptBytes);
-        }
-      }
+      token.value++; */
+      printcontroller.printTest();
     } catch (e) {
       print("Error saving receipt: $e");
     } finally {

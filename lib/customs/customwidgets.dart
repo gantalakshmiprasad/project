@@ -1,10 +1,10 @@
+import 'package:firstproject/viewmodel/connectionctl/bluetoothctl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:lottie/lottie.dart';
-
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 
@@ -653,6 +653,16 @@ AppBar appbar(Homepagecontroller controller) {
         icon: const Icon(Icons.delete_sweep_outlined, color: Color(0xFFFB7185)),
       ),
       if (Get.width > 900) ...[
+        IconButton(
+          tooltip: 'Connect printer',
+          onPressed: () async {
+            final bluetoothctl = Get.put(BluetoothController());
+            controller.isbluetoothclicked.value =
+                !controller.isbluetoothclicked.value;
+            bluetoothctl.getBluetooths();
+          },
+          icon: Icon(Icons.usb, color: Colors.white),
+        ),
         IconButton(
           tooltip: 'Ledger Registry History',
           onPressed: () => Get.offAllNamed('/billshistory'),

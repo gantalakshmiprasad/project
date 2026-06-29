@@ -57,7 +57,9 @@ class Printitems extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () => controller.printReceipt(),
+                    onPressed: () {
+                      controller.printReceipt();
+                    },
                     icon: const Icon(
                       Icons.print_rounded,
                       color: Color(0xFF1E293B),

@@ -48,9 +48,9 @@ dependencies:
   google_generative_ai: ^0.4.7
   font_awesome_flutter: ^11.0.0
   table_calendar: ^3.2.0
-  web: ^1.1.1
-  usb_device: ^1.0.2
-
+  print_bluetooth_thermal: ^1.2.1
+  permission_handler: ^11.0.0
+  esc_pos_utils_plus: ^2.0.4
  
 dev_dependencies:
   flutter_test:

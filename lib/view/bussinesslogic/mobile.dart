@@ -1,8 +1,10 @@
 import 'package:firstproject/customs/customwidgets.dart';
 import 'package:firstproject/view/bussinesslogic/billprintview.dart';
 import 'package:firstproject/view/bussinesslogic/print.dart';
+import 'package:firstproject/view/connectionview/bluetoothUI.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/billscontroller.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/printcontroller.dart';
+import 'package:firstproject/viewmodel/connectionctl/bluetoothctl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -15,15 +17,13 @@ class Mobile extends StatelessWidget {
   Widget build(BuildContext context) {
     // BUG FIX: Consolidated multiple nested Obx loops into one clean global listener block
     return Obx(() {
-      final itemslength = Get.find<Printcontroller>().totalQuantity;
-
       return Scaffold(
-        backgroundColor: const Color(0xFF0B1517),
+        backgroundColor: const Color.fromARGB(255, 228, 234, 237),
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xFF0F262A),
+          backgroundColor: const Color.fromARGB(255, 2, 108, 126),
           title: const Text(
-            'UBS Terminal',
+            'UBS',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -35,16 +35,17 @@ class Mobile extends StatelessWidget {
               icon: const Icon(Icons.add, color: Color(0xFF2DD4BF)),
               onPressed: () => controller.opendialog(),
             ),
-            Center(
-              child: Text(
-                'Items: $itemslength',
-                style: const TextStyle(
-                  color: Color(0xFFF59E0B),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
+            IconButton(
+              icon: const Icon(Icons.bluetooth, color: Color(0xFF2DD4BF)),
+              onPressed: () async {
+                final bluetoothctl = Get.put(BluetoothController());
+                controller.isbluetoothclicked.value =
+                    !controller.isbluetoothclicked.value;
+                bluetoothctl.checkAndRequestPermissions();
+                bluetoothctl.getBluetooths();
+              },
             ),
+
             IconButton(
               icon: const Icon(Icons.print, color: Colors.white),
               onPressed: () {
@@ -68,7 +69,7 @@ class Mobile extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: const Color(0xFF0F262A),
+          backgroundColor: const Color.fromARGB(255, 0, 27, 32),
           selectedItemColor: const Color(0xFF2DD4BF),
           unselectedItemColor: const Color(0xFF64748B),
           currentIndex: controller.currentindex.value,
@@ -115,7 +116,7 @@ class Mobile extends StatelessWidget {
                     )
                   : Container(
                       padding: const EdgeInsets.all(8),
-                      color: const Color(0xFF0B1517),
+                      color: const Color.fromARGB(255, 226, 233, 235),
                       child: GridView.builder(
                         itemCount: controller.database.length,
                         physics: const AlwaysScrollableScrollPhysics(),
@@ -155,6 +156,31 @@ class Mobile extends StatelessWidget {
                   width: Get.width * 0.85,
                   height: Get.height * 0.7,
                   child: itemform(controller),
+                ),
+              if (controller.isbluetoothclicked.value)
+                Container(
+                  width: 330,
+                  height: 350,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      Bluetoothui(),
+                      IconButton(
+                        onPressed: () {
+                          controller.isbluetoothclicked.value = false;
+                        },
+                        icon: Icon(
+                          Icons.cancel,
+                          color: Colors.orange,
+                          size: 30,
+                        ),
+                      ),
+                    ],
+                  ), // ✅ no Expanded inside
                 ),
             ],
           );

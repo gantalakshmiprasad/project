@@ -1,3 +1,4 @@
+import 'package:firstproject/view/connectionview/bluetoothUI.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -115,6 +116,23 @@ class Desktop extends StatelessWidget {
                         ],
                       ),
                       child: Center(child: itemform(controller)),
+                    ),
+                  if (controller.isbluetoothclicked.value)
+                    Container(
+                      height: 450,
+                      width: 700,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: const Color.fromARGB(255, 252, 255, 253),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black,
+                            blurRadius: 30,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Center(child: Bluetoothui()),
                     ),
                 ],
               );

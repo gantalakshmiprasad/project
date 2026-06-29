@@ -17,7 +17,7 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0B1517), // Match landing canvas base
       body: Container(
-        width: double.infinity,
+        width: double.infinity - 5,
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: RadialGradient(
@@ -35,7 +35,7 @@ class LoginScreen extends StatelessWidget {
         child: Center(
           child: SizedBox(
             width:
-                460, // Sized slightly narrower for perfect desktop proportions
+                430, // Sized slightly narrower for perfect desktop proportions
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ClipRRect(
@@ -74,7 +74,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ),
                           child: const Text(
-                            'UBS',
+                            'Billify',
                             style: TextStyle(
                               color: Color(0xFF2DD4BF), // Unified theme teal
                               fontSize: 32,
@@ -233,7 +233,7 @@ class LoginScreen extends StatelessWidget {
                                 fontSize: 14,
                               ),
                             ),
-                            const SizedBox(width: 4),
+
                             TextButton(
                               onPressed: () => Get.toNamed('/signup'),
                               style: TextButton.styleFrom(

@@ -28,7 +28,7 @@ class Homepagecontroller extends GetxController {
   void opendialog() => addclicked.value = true;
   void closedialog() => addclicked.value = false;
   final RxString message = ''.obs;
-
+  final RxBool isbluetoothclicked = false.obs;
   final Databaseservice dbservice = Get.find<Databaseservice>();
   final AuthServices authservice = Get.find<AuthServices>();
   final Storageservice storageservice = Get.find<Storageservice>();
