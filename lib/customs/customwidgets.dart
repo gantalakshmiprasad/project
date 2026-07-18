@@ -1,4 +1,4 @@
-import 'package:firstproject/viewmodel/connectionctl/bluetoothctl.dart';
+import 'package:firstproject/connection/universalblectl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -253,52 +253,66 @@ class ItemCard extends StatelessWidget {
 
     bool hasItem = quantity > 0;
 
-    return SizedBox(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: InkWell(
-              onTap: decrease,
-              child: Center(
-                child: Icon(
-                  Icons.remove,
-                  size: 25,
-                  color: hasItem
-                      ? quantity > 0
-                            ? Colors.black
-                            : Colors.white
-                      : Colors.white60,
+    return hasItem
+        ? SizedBox(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: decrease,
+                    child: Center(
+                      child: Icon(
+                        Icons.remove,
+                        size: 25,
+                        color: hasItem
+                            ? quantity > 0
+                                  ? Colors.black
+                                  : Colors.white
+                            : Colors.white60,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      '$quantity',
+                      style: TextStyle(
+                        color: quantity > 0 ? Colors.black : Colors.white,
+                        fontSize: 25,
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: increase,
+                    child: Center(
+                      child: Icon(
+                        Icons.add,
+                        size: 25,
+                        color: quantity > 0 ? Colors.black : Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Expanded(
-            child: Center(
+          )
+        : Center(
+            child: ElevatedButton(
+              onPressed: increase,
               child: Text(
-                '$quantity',
+                'ADD',
                 style: TextStyle(
-                  color: quantity > 0 ? Colors.black : Colors.white,
-                  fontSize: 25,
+                  color: Colors.orange,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: InkWell(
-              onTap: increase,
-              child: Center(
-                child: Icon(
-                  Icons.add,
-                  size: 25,
-                  color: quantity > 0 ? Colors.black : Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 }
 
@@ -670,12 +684,40 @@ AppBar appbar(dynamic controller) {
         IconButton(
           tooltip: 'Connect printer',
           onPressed: () async {
-            final bluetoothctl = Get.put(BluetoothController());
-            controller.isbluetoothclicked.value =
-                !controller.isbluetoothclicked.value;
-            bluetoothctl.getBluetooths();
+            controller.isbluetoothclicked.value = true;
+
+            // 1. Clear previous state if needed
+            final btcontroller = Get.put(UniversalBleController());
+            btcontroller.isScanning.value = true;
+
+            // 2. Start scanning
+            await btcontroller.startScan();
+
+            // 3. Show a bottom sheet to let the user select a printer
+            Get.bottomSheet(
+              Container(
+                height: 300,
+                color: Colors.white,
+                child: Obx(
+                  () => ListView.builder(
+                    itemCount: /* You would need an observable list in your controller */
+                        0,
+                    itemBuilder: (context, index) {
+                      final device = btcontroller.discoveredDevices[index];
+                      return ListTile(
+                        title: Text(device.deviceId),
+                        onTap: () {
+                          btcontroller.connectToDevice(device);
+                          Get.back(); // Close bottom sheet
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
           },
-          icon: Icon(Icons.usb, color: Colors.white),
+          icon: const Icon(Icons.bluetooth_searching),
         ),
         IconButton(
           tooltip: 'Ledger Registry History',

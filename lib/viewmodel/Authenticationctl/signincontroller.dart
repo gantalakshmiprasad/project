@@ -11,13 +11,13 @@ class Signincontroller extends GetxController {
   final globalkey = GlobalKey<FormState>();
   final RxBool profileupdated = false.obs;
   final RxBool showpassword = true.obs;
-  /* 
+
   @override
   void onInit() async {
     super.onInit();
     await Get.find<AuthServices>().account.deleteSessions();
   }
- */
+
   void togglepassword() {
     showpassword.value = !showpassword.value;
   }
