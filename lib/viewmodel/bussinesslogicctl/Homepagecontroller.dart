@@ -21,7 +21,6 @@ class Homepagecontroller extends GetxController {
   final RxBool issignedout = false.obs;
   final RxBool addclicked = false.obs;
   final RxBool isitemsloading = false.obs;
-  final printcontroller = Get.put(Printcontroller());
   final userid = ''.obs;
   final GlobalKey<FormState> formkey = GlobalKey<FormState>();
   final RxBool isimageclicked = false.obs;
@@ -207,17 +206,19 @@ class Homepagecontroller extends GetxController {
     database.refresh();
 
     // 2. Update Print Controller
-    var existingBillIndex = printcontroller.bills.indexWhere(
+    var existingBillIndex = Get.find<Printcontroller>().bills.indexWhere(
       (bill) => bill['id'] == id,
     );
 
     if (existingBillIndex != -1) {
-      printcontroller.bills[existingBillIndex]['quantity']++;
+      Get.find<Printcontroller>().bills[existingBillIndex]['quantity']++;
       double price = double.parse(
-        printcontroller.bills[existingBillIndex]['itemprice'].toString(),
+        Get.find<Printcontroller>().bills[existingBillIndex]['itemprice']
+            .toString(),
       );
-      printcontroller.bills[existingBillIndex]['amount'] =
-          price * printcontroller.bills[existingBillIndex]['quantity'];
+      Get.find<Printcontroller>().bills[existingBillIndex]['amount'] =
+          price *
+          Get.find<Printcontroller>().bills[existingBillIndex]['quantity'];
     } else {
       // Create new bill entry from product
       final product = database[index];
@@ -230,10 +231,10 @@ class Homepagecontroller extends GetxController {
         'restaurantid': user.$id,
       };
       print(billEntry);
-      printcontroller.bills.add(billEntry);
+      Get.find<Printcontroller>().bills.add(billEntry);
     }
 
-    printcontroller.bills.refresh();
+    Get.find<Printcontroller>().bills.refresh();
   }
 
   void decreasequantity(String id) {
@@ -247,23 +248,26 @@ class Homepagecontroller extends GetxController {
       database.refresh();
 
       // 2. Update Print Controller
-      var existingBillIndex = printcontroller.bills.indexWhere(
+      var existingBillIndex = Get.find<Printcontroller>().bills.indexWhere(
         (bill) => bill['id'] == id,
       );
       if (existingBillIndex != -1) {
-        if (printcontroller.bills[existingBillIndex]['quantity'] > 1) {
-          printcontroller.bills[existingBillIndex]['quantity']--;
+        if (Get.find<Printcontroller>().bills[existingBillIndex]['quantity'] >
+            1) {
+          Get.find<Printcontroller>().bills[existingBillIndex]['quantity']--;
           double price = double.parse(
-            printcontroller.bills[existingBillIndex]['itemprice'].toString(),
+            Get.find<Printcontroller>().bills[existingBillIndex]['itemprice']
+                .toString(),
           );
-          printcontroller.bills[existingBillIndex]['amount'] =
-              price * printcontroller.bills[existingBillIndex]['quantity'];
+          Get.find<Printcontroller>().bills[existingBillIndex]['amount'] =
+              price *
+              Get.find<Printcontroller>().bills[existingBillIndex]['quantity'];
         } else {
-          printcontroller.bills.removeAt(existingBillIndex);
+          Get.find<Printcontroller>().bills.removeAt(existingBillIndex);
         }
       }
 
-      printcontroller.bills.refresh();
+      Get.find<Printcontroller>().bills.refresh();
     }
   }
 
@@ -391,9 +395,9 @@ class Homepagecontroller extends GetxController {
       // Clear local reactive memory data frames safely
       database.clear();
 
-      // 4. Double check printcontroller instance validity
-      // If printcontroller is an injected dependency, consider: Get.find<PrintController>().bills.clear();
-      printcontroller.bills.clear();
+      // 4. Double check Get.find<Printcontroller>() instance validity
+      // If Get.find<Printcontroller>() is an injected dependency, consider: Get.find<PrintController>().bills.clear();
+      Get.find<Printcontroller>().bills.clear();
 
       Get.snackbar(
         'Success',
@@ -413,12 +417,5 @@ class Homepagecontroller extends GetxController {
     } finally {
       isitemsloading.value = false;
     }
-  }
-
-  @override
-  void onClose() {
-    namecontroller.dispose();
-    pricecontroller.dispose();
-    super.onClose();
   }
 }

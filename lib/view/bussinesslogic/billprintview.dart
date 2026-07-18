@@ -84,7 +84,7 @@ class PhysicalGetxCalendarPage extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      textConfirm: "Purge All",
+                      textConfirm: "Delete",
                       textCancel: "Abort",
                       confirmTextColor: Colors.white,
                       cancelTextColor: mainText,

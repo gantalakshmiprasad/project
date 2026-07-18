@@ -135,30 +135,6 @@ class ItemCard extends StatelessWidget {
                           height: double.infinity,
                           child: Image.memory(imageurl, fit: BoxFit.cover),
                         ),
-
-                        if (isSelected && available)
-                          Positioned(
-                            top: 12,
-                            left: 12,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                              ),
-                              child: Text(
-                                "$quantity Selected",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -169,9 +145,9 @@ class ItemCard extends StatelessWidget {
                       children: [
                         AutoSizeText(
                           itemName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: quantity > 0 ? Colors.black : Colors.white,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -181,9 +157,9 @@ class ItemCard extends StatelessWidget {
                           "Price : ₹$price /-",
                           maxFontSize: 20,
                           minFontSize: 15,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: quantity > 0 ? Colors.black : Colors.white,
                           ),
                           maxLines: 1,
                         ),
@@ -197,37 +173,64 @@ class ItemCard extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            top: 6,
-            right: 6,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  tooltip: available ? 'Mark sold out' : 'Mark available',
-                  onPressed: onedit,
-                  constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(6),
-                  icon: Icon(
-                    available ? Icons.check_circle : Icons.do_not_disturb_on,
-                    color: available ? Colors.green : const Color(0xFFFB7185),
-                    size: 22,
+          quantity <= 0
+              ? Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: available ? 'Mark sold out' : 'Mark available',
+                        onPressed: onedit,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(6),
+                        icon: Icon(
+                          available
+                              ? Icons.check_circle
+                              : Icons.do_not_disturb_on,
+                          color: available
+                              ? Colors.green
+                              : const Color(0xFFFB7185),
+                          size: 22,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'delete item',
+                        onPressed: ondelete,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(6),
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: Color(0xFFFB7185),
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.orange,
+                    ),
+                    child: Text(
+                      "$quantity",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
-                IconButton(
-                  tooltip: 'delete item',
-                  onPressed: ondelete,
-                  constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(6),
-                  icon: const Icon(
-                    Icons.delete_outline_rounded,
-                    color: Color(0xFFFB7185),
-                    size: 22,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -261,7 +264,11 @@ class ItemCard extends StatelessWidget {
                 child: Icon(
                   Icons.remove,
                   size: 25,
-                  color: hasItem ? Colors.white : Colors.white60,
+                  color: hasItem
+                      ? quantity > 0
+                            ? Colors.black
+                            : Colors.white
+                      : Colors.white60,
                 ),
               ),
             ),
@@ -270,7 +277,10 @@ class ItemCard extends StatelessWidget {
             child: Center(
               child: Text(
                 '$quantity',
-                style: TextStyle(color: Colors.white, fontSize: 25),
+                style: TextStyle(
+                  color: quantity > 0 ? Colors.black : Colors.white,
+                  fontSize: 25,
+                ),
               ),
             ),
           ),
@@ -278,7 +288,11 @@ class ItemCard extends StatelessWidget {
             child: InkWell(
               onTap: increase,
               child: Center(
-                child: Icon(Icons.add, size: 25, color: Colors.white),
+                child: Icon(
+                  Icons.add,
+                  size: 25,
+                  color: quantity > 0 ? Colors.black : Colors.white,
+                ),
               ),
             ),
           ),
@@ -483,7 +497,7 @@ class Defaultext extends StatelessWidget {
   }
 }
 
-Widget addbutton(Homepagecontroller controller) {
+Widget addbutton(dynamic controller) {
   return Padding(
     padding: const EdgeInsets.all(12),
     child: FloatingActionButton(
@@ -494,7 +508,7 @@ Widget addbutton(Homepagecontroller controller) {
   );
 }
 
-Stack itemform(Homepagecontroller controller) {
+Stack itemform(dynamic controller) {
   return Stack(
     alignment: Alignment.topRight,
     children: [
@@ -531,7 +545,7 @@ Stack itemform(Homepagecontroller controller) {
   );
 }
 
-AppBar appbar(Homepagecontroller controller) {
+AppBar appbar(dynamic controller) {
   // Define the layout list order for the filter menu navigation bar
   final List<String> filterCategories = [
     'All items',
@@ -665,7 +679,7 @@ AppBar appbar(Homepagecontroller controller) {
         ),
         IconButton(
           tooltip: 'Ledger Registry History',
-          onPressed: () => Get.offAllNamed('/billshistory'),
+          onPressed: () => Get.toNamed('/billshistory'),
           icon: const Icon(
             Icons.history_toggle_off_rounded,
             color: Colors.white,
@@ -689,7 +703,7 @@ AppBar appbar(Homepagecontroller controller) {
   );
 }
 
-Widget buildMobileNavigationDrawer(Homepagecontroller controller) {
+Widget buildMobileNavigationDrawer(dynamic controller) {
   return Drawer(
     child: Container(
       color: Colors.white,
@@ -770,7 +784,7 @@ Widget buildMobileNavigationDrawer(Homepagecontroller controller) {
   );
 }
 
-void _showDeleteAllItemsDialog(Homepagecontroller controller) {
+void _showDeleteAllItemsDialog(dynamic controller) {
   Get.defaultDialog(
     backgroundColor: Colors.white,
     title: 'Purge Directory Catalog?',
@@ -809,7 +823,7 @@ void _showDeleteAllItemsDialog(Homepagecontroller controller) {
   );
 }
 
-void _handleLogoutSignOut(Homepagecontroller controller) {
+void _handleLogoutSignOut(dynamic controller) {
   Get.showOverlay(
     asyncFunction: () => controller.onclosed(controller.database),
     loadingWidget: Center(

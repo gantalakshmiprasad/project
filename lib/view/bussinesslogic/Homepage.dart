@@ -19,8 +19,6 @@ class Homepage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final double adaptiveWidth = constraints.maxWidth;
-
-          // BUG FIX: Added unified inclusive equality checks to prevent component flickering or layout dead zones
           if (adaptiveWidth <= 640) {
             return Mobile(controller: controller);
           } else if (adaptiveWidth > 640 && adaptiveWidth <= 1024) {

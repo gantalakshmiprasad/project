@@ -1,14 +1,18 @@
 // ignore_for_file: avoid_print
-
+import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/enums.dart';
 import 'package:firstproject/customs/config.dart';
 import 'package:firstproject/services/authservices.dart';
 import 'package:firstproject/services/databaseservice.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
 import 'package:firstproject/viewmodel/connectionctl/bluetoothctl.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class Printcontroller extends GetxController {
+  late final Homepagecontroller homepagectl;
+  final bluetoothctl = Get.put(BluetoothController());
   final RxString bussinesstitle = ''.obs;
   final RxString address = ''.obs;
   final RxList bills = [].obs;
@@ -32,6 +36,7 @@ class Printcontroller extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    homepagectl = Get.find<Homepagecontroller>();
     try {
       final user = await Get.find<AuthServices>().getaccount();
       print('This is from printfile:${user.$id}');
@@ -61,20 +66,21 @@ class Printcontroller extends GetxController {
   }
 
   Future<void> printReceipt() async {
-    final homepagectl = Get.find<Homepagecontroller>();
-    final printcontroller = Get.put(BluetoothController());
     if (bills.isEmpty) return;
+    DateTime now = DateTime.now();
 
+    // Pattern: Day/Month/Year Hour:Minute AM/PM
+    String customFormat = DateFormat('dd/MM/yyyy hh:mm a').format(now);
     try {
-      /*   isloading.value = true;
+      isloading.value = true;
       final currentBillNo = billno.value;
-      final currentTotal = int.tryParse(totalAmount.toString());
+      final currentTotal = totalAmount;
       final itemsToSave = List.from(bills);
 
       final user = await Get.find<AuthServices>().getaccount();
       final data1 = {
         'billnumber': currentBillNo,
-        'totalamount': currentTotal,
+        'totalamount': currentTotal.toInt(),
         'restaurantid': user.$id,
       };
 
@@ -99,32 +105,67 @@ class Printcontroller extends GetxController {
 
       checkoutHistory.add(receipt);
       bills.clear();
-      billno.value++; */
+      billno.value++;
 
-      /* final execution = await Get.find<AuthServices>().function.createExecution(
+      final execution = await Get.find<AuthServices>().function.createExecution(
         functionId: ApiConfig().functionid,
         method: ExecutionMethod.pOST,
         body: jsonEncode({
           "action": "printreceipt",
           "storeName": bussinesstitle.value,
-          "invoiceId": "INV-$currentBillNo",
-          "date": DateTime.now().toString(),
+          "invoiceId": "$currentBillNo",
+          "date": customFormat,
           "printerWidth": 58,
           "items": itemsToSave,
           "total": currentTotal,
         }),
-      ); */
-      /* 
+      );
+
       for (var item in homepagectl.database) {
         item['quantity'] = 0;
       }
       homepagectl.database.refresh();
-      token.value++; */
-      printcontroller.printTest();
+      token.value++;
+
+      if (execution.responseBody.isEmpty) {
+        Get.snackbar(
+          "Print error",
+          "No response from the print function.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      final response = jsonDecode(execution.responseBody);
+      final base64string = response['bytes'];
+      if (base64string == null || (base64string as String).isEmpty) {
+        Get.snackbar(
+          "Print error",
+          "The print function did not return any receipt data.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      final List<int> receiptBytes = base64.decode(base64string);
+      await bluetoothctl.printTest(receiptBytes);
+      reset();
     } catch (e) {
       print("Error saving receipt: $e");
     } finally {
       isloading.value = false;
+    }
+  }
+
+  void reset() {
+    try {
+      bills.clear();
+      for (var item in homepagectl.database) {
+        item['quantity'] = 0;
+      }
+      homepagectl.database.refresh();
+    } catch (e) {
+      throw e.toString();
     }
   }
 }

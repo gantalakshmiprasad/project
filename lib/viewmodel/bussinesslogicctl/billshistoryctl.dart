@@ -121,6 +121,8 @@ class PhysicalCalendarController extends GetxController {
 
       // 5. Clear local state only after successful DB deletion
       billsList.clear();
+ 
+ 
       Get.snackbar(
         "Success",
         "All records cleared from database.",

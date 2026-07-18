@@ -12,7 +12,6 @@ class Billscontroller extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
     fetchBills();
   }
 

@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.firstproject"
-    compileSdk = 34
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.firstproject"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"

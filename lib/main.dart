@@ -17,6 +17,7 @@ import 'package:firstproject/view/bussinesslogic/paymentstatus.dart';
 import 'package:firstproject/view/bussinesslogic/print.dart';
 import 'package:firstproject/view/bussinesslogic/profilepage.dart';
 import 'package:firstproject/viewmodel/bussinesslogicctl/Homepagecontroller.dart';
+import 'package:firstproject/viewmodel/bussinesslogicctl/printcontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'customs/config.dart';
@@ -53,9 +54,7 @@ void main() async {
   // 4. STEP 2: Register lazy controllers safely
   Get.lazyPut(() => Paymentstatuscontroller());
   Get.lazyPut(() => Homepagecontroller());
-  //Get.put(XPrinterController());
-  // 5. STEP 3: Initialize user details controller
-  // Now this can safely run Get.find<AuthServices>() inside its onInit() hook!
+  Get.lazyPut(() => Printcontroller());
 
   runApp(const MyApp());
 }
@@ -74,7 +73,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/', page: () => Introductionpage()),
         GetPage(name: '/login', page: () => LoginScreen()),
-        GetPage(name: '/signup', page: () => Signup()), 
+        GetPage(name: '/signup', page: () => Signup()),
         GetPage(name: '/homepage', page: () => Homepage()),
         GetPage(name: '/verificationpage', page: () => Verificationpage()),
         GetPage(name: '/forgotpassword', page: () => Forgotpassword()),

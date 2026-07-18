@@ -19,7 +19,22 @@ class Printitems extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.topLeft,
+                child: TextButton(
+                  onPressed: () {
+                    Get.defaultDialog(
+                      content: Text('Do you want to reset?'),
+                      onCancel: Get.back,
+                      onConfirm: () {
+                        controller.reset();
+                        Get.back();
+                      },
+                    );
+                  },
+                  child: Text('Reset', style: TextStyle(color: Colors.orange)),
+                ),
+              ),
               // Main title header layout with print button
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,

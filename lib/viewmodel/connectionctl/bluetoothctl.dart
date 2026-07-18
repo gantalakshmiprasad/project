@@ -1,4 +1,5 @@
-import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -96,21 +97,33 @@ class BluetoothController extends GetxController {
     isConnected.value = false;
   }
 
-  Future<void> printTest() async {
+  Future<void> printTest(List<int> bytes) async {
     bool status = await PrintBluetoothThermal.connectionStatus;
-    if (!status) return;
+    isConnected.value = status;
+    if (!status) {
+      Get.snackbar(
+        "Printer not connected",
+        "Please connect a Bluetooth printer before printing.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
-    // 1. Load profile and generator
-    final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm58, profile);
-
-    // 2. Build bytes
-    List<int> bytes = [];
-    bytes += generator.text("My name is lakshmiprasad");
-    bytes += generator.feed(2);
-    bytes += generator.cut();
-
-    // 3. Send to printer
-    await PrintBluetoothThermal.writeBytes(bytes);
+    try {
+      // base64.decode() returns a Uint8List, which is sent over the method
+      // channel as a Java byte[]. The plugin expects a java.util.List, so
+      // convert it to a plain List<int> to avoid:
+      // "byte[] cannot be cast to java.util.List".
+      final List<int> payload = bytes is Uint8List
+          ? List<int>.from(bytes)
+          : bytes;
+      await PrintBluetoothThermal.writeBytes(payload);
+    } catch (e) {
+      Get.snackbar(
+        "Print error",
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }
